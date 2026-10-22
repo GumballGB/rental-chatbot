@@ -1,3 +1,4 @@
-print("Hello, World!")
+import scripts.header as header
 
-print("This is a test file. Probably will be deleted soon.")
+
+header.display_header()
