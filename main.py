@@ -7,11 +7,10 @@ if __name__ == "__main__":
 
     client = af.boot_anthropic()
 
-    print("Enter your prompt")
-    user_message = input()
 
-    response = af.get_response_classify_unit_enquiry(user_message, client)
+    enquiry = af.get_response_unit_enquiry(client)
 
-    clean= UnitEnquiry.model_validate_json(response)  # Validate that the response can be parsed into a UnitEnquiry model
+    # Convert the enquiry to a dictionary
+    enquiry_dict = enquiry.model_dump()
 
-    print(clean)
+    print(enquiry_dict)
