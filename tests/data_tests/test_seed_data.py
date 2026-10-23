@@ -6,7 +6,6 @@
 import pytest
 from pydantic import ValidationError
 from models.building import Building
-from models.unit_enquiry import UnitEnquiry
 from models.listings import Listing
 from models.location import Location
 import json

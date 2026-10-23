@@ -1,0 +1,122 @@
+[
+  {
+    "enquiry_id": "ENQ-001",
+    "name": "Alex Morgan",
+    "email": "alex.morgan@example.com",
+    "phone": "+1-514-555-0101",
+    "move_in_date": "2026-11-01",
+    "budget": 1600,
+    "budget_currency": "CAD",
+    "received_date": "2026-10-20",
+    "message": "Hello! I am looking for a studio in Griffintown for November. I work full-time and prefer a quiet building. Are cats permitted, and is the advertised rent inclusive of heating? I could visit after 5 p.m. on weekdays.",
+    "listing_id": "LST-001"
+  },
+  {
+    "enquiry_id": "ENQ-002",
+    "name": "Camille Dubois",
+    "email": "camille.dubois@example.com",
+    "phone": null,
+    "move_in_date": "2026-12-01",
+    "budget": 1950,
+    "budget_currency": "CAD",
+    "received_date": "2026-10-21",
+    "message": "Bonjour! Le logement une chambre près du centre-ville m’intéresse. Je cherche pour le 1er décembre. Est-ce possible de visiter durant la fin de semaine? Je voudrais aussi savoir si les électroménagers sont inclus.",
+    "listing_id": "LST-002"
+  },
+  {
+    "enquiry_id": "ENQ-003",
+    "name": "Jordan Lee",
+    "email": "jordan.lee@example.com",
+    "phone": "+1-514-555-0102",
+    "move_in_date": "2026-11-15",
+    "budget": 1800,
+    "budget_currency": "CAD",
+    "received_date": "2026-10-21",
+    "message": "Interested in the one-bedroom unit. I can be flexible by two weeks on the move-in date. I have a small dog; please confirm pet policy and whether indoor parking is offered. I am comparing a few options.",
+    "listing_id": "LST-004"
+  },
+  {
+    "enquiry_id": "ENQ-004",
+    "name": null,
+    "email": "no-name-lead@example.com",
+    "phone": null,
+    "move_in_date": null,
+    "budget": null,
+    "budget_currency": null,
+    "received_date": "2026-10-22",
+    "message": "Is this apartment still available? Please send more details and the next viewing date.",
+    "listing_id": "LST-007"
+  },
+  {
+    "enquiry_id": "ENQ-005",
+    "name": "Samira Haddad",
+    "email": "samira.haddad@example.com",
+    "phone": "+1-514-555-0103",
+    "move_in_date": "2027-01-01",
+    "budget": 2450,
+    "budget_currency": "CAD",
+    "received_date": "2026-10-22",
+    "message": "We are two adults looking for a two-bedroom apartment early next year. We would like a dishwasher, laundry and transit nearby. Can you confirm the lease length and whether there are any move-in promotions?",
+    "listing_id": "LST-013"
+  },
+  {
+    "enquiry_id": "ENQ-006",
+    "name": "Thomas Reed",
+    "email": "thomas.reed@example.com",
+    "phone": null,
+    "move_in_date": "2026-12-15",
+    "budget": 2500,
+    "budget_currency": "CAD",
+    "received_date": "2026-10-22",
+    "message": "I found this two-bedroom listing, but it may no longer be available. Could you let me know if it is coming back, or suggest a similar unit under my budget? I would prefer a place close to public transportation.",
+    "listing_id": "LST-022"
+  },
+  {
+    "enquiry_id": "ENQ-007",
+    "name": "Sofie Nielsen",
+    "email": "sofie.nielsen@example.com",
+    "phone": null,
+    "move_in_date": "2027-02-01",
+    "budget": 13000,
+    "budget_currency": "DKK",
+    "received_date": "2026-10-22",
+    "message": "Hej! We are interested in the two-room-bedroom apartment in Copenhagen. Is the rent quoted in DKK, and are utilities billed separately? We can provide employment documentation and would like an online viewing.",
+    "listing_id": "LST-082"
+  },
+  {
+    "enquiry_id": "ENQ-008",
+    "name": "Emil Sørensen",
+    "email": "emil.sorensen@example.com",
+    "phone": null,
+    "move_in_date": "2027-05-01",
+    "budget": 8500,
+    "budget_currency": "DKK",
+    "received_date": "2026-10-23",
+    "message": "Hej, I am relocating for a new job and looking for a small Copenhagen studio from May. Is bicycle storage available? I can be flexible by a couple of weeks and would appreciate details about the deposit and prepaid rent.",
+    "listing_id": "LST-120"
+  },
+  {
+    "enquiry_id": "ENQ-009",
+    "name": "Maja Petersen",
+    "email": "maja.petersen@example.com",
+    "phone": null,
+    "move_in_date": "2027-03-01",
+    "budget": 12500,
+    "budget_currency": "DKK",
+    "received_date": "2026-10-23",
+    "message": "I saw that this apartment is pending. Please keep my enquiry on file in case it becomes available. Do you allow pets, and is the nearest metro within walking distance?",
+    "listing_id": "LST-142"
+  },
+  {
+    "enquiry_id": "ENQ-010",
+    "name": "Taylor Kim",
+    "email": "taylor.kim@example.com",
+    "phone": null,
+    "move_in_date": "2026-12-01",
+    "budget": 2100,
+    "budget_currency": "CAD",
+    "received_date": "2026-10-23",
+    "message": "I have not chosen a particular listing yet. Looking for a one-bedroom in Montreal with a gym and in-unit laundry. I work remotely and would prefer a quieter building. Please share options that fit my budget.",
+    "listing_id": null
+  }
+]
