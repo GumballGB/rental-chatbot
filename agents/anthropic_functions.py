@@ -1,7 +1,9 @@
-import os
-from anthropic import Anthropic
-from models.unit_enquiry import UnitEnquiry
 import json
+import os
+
+from anthropic import Anthropic
+
+from models.unit_enquiry import UnitEnquiry
 
 SYSTEM_PROMPT = """
 You extract information from rental unit enquiries.

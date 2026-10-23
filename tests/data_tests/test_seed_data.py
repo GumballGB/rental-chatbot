@@ -3,12 +3,14 @@
 # This test will ensure that the data adheres to the defined Pydantic models and meets the required constraints.
 # Also, this seed data was generated using ChatGPT
 
+import json
+
 import pytest
 from pydantic import ValidationError
+
 from models.building import Building
 from models.listings import Listing
 from models.location import Location
-import json
 
 
 def test_seed_location_data():

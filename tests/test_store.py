@@ -1,7 +1,11 @@
 # Testing file dedicated into testing the store.py functionality
 
-from core.store import JsonStore
 import json
+
+import pytest
+
+from core.store import JsonStore, NotFoundError
+
 
 # count the number of listing in the JSON
 def count_num():
@@ -39,3 +43,22 @@ def test_store():
     assert len(store.buildings) == num_buildings
     assert len(store.listings) == num_listings
     assert len(store.locations) == num_locations
+
+def test_get_happy_listing():
+
+    store = JsonStore()
+
+    listing_id = store.get_listing("LST-001")
+    assert listing_id.listing_id == "LST-001"
+
+
+def test_get_faulty_listing():
+
+    store = JsonStore()
+
+    with pytest.raises(NotFoundError) as exc_info:
+        store.get_listing("LST-999")
+
+    assert str(exc_info.value) == (
+        "Listing with id LST-999 not found."
+    )

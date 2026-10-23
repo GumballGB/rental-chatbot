@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 
+
 class UnitEnquiry(BaseModel):
 
     # Basic information about the enquiry
