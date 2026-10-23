@@ -1,0 +1,757 @@
+[
+  {
+    "building_id": "BLD-001",
+    "name": "Canal Demo Residences",
+    "address": "101 Rue Exemple-Canal, Montréal (fictional)",
+    "postal_code": "TEST-GRF-01",
+    "province": "Quebec",
+    "location_id": "LOC-001",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 86,
+    "amenities": [
+      "gym",
+      "rooftop terrace",
+      "elevator",
+      "bike storage"
+    ],
+    "parking": "indoor",
+    "description": "Canal Demo Residences is a fictional rental community created for search and recommendation testing. The property offers gym, rooftop terrace, elevator and a mix of homes designed for different household sizes. Its area is suitable for exploring neighbourhood-based search, amenities matching, and questions about building versus unit-level features. The street address is intentionally synthetic and is not a real rentable property.",
+    "year_built": 2022
+  },
+  {
+    "building_id": "BLD-002",
+    "name": "Atelier du Canal Demo",
+    "address": "202 Rue Exemple-Canal, Montréal (fictional)",
+    "postal_code": "TEST-GRF-02",
+    "province": "Quebec",
+    "location_id": "LOC-001",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 35,
+    "amenities": [
+      "elevator",
+      "shared courtyard"
+    ],
+    "parking": "street",
+    "description": "Atelier du Canal Demo is a fictional rental community created for search and recommendation testing. The property offers elevator, shared courtyard and a mix of homes designed for different household sizes. Its area is suitable for exploring neighbourhood-based search, amenities matching, and questions about building versus unit-level features. The street address is intentionally synthetic and is not a real rentable property.",
+    "year_built": 2019
+  },
+  {
+    "building_id": "BLD-003",
+    "name": "Pierce Demo Suites",
+    "address": "303 Rue Exemple-Centre, Montréal (fictional)",
+    "postal_code": "TEST-DTN-01",
+    "province": "Quebec",
+    "location_id": "LOC-002",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 112,
+    "amenities": [
+      "elevator",
+      "laundry room",
+      "secure entry"
+    ],
+    "parking": "none",
+    "description": "Pierce Demo Suites is a fictional rental community created for search and recommendation testing. The property offers elevator, laundry room, secure entry and a mix of homes designed for different household sizes. Its area is suitable for exploring neighbourhood-based search, amenities matching, and questions about building versus unit-level features. The street address is intentionally synthetic and is not a real rentable property.",
+    "year_built": 2016
+  },
+  {
+    "building_id": "BLD-004",
+    "name": "Loyola Demo Gardens",
+    "address": "404 Avenue Exemple-Loyola, Montréal (fictional)",
+    "postal_code": "TEST-NDG-01",
+    "province": "Quebec",
+    "location_id": "LOC-003",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 48,
+    "amenities": [
+      "indoor pool",
+      "sauna",
+      "elevator"
+    ],
+    "parking": "outdoor",
+    "description": "Loyola Demo Gardens is a fictional rental community created for search and recommendation testing. The property offers indoor pool, sauna, elevator and a mix of homes designed for different household sizes. Its area is suitable for exploring neighbourhood-based search, amenities matching, and questions about building versus unit-level features. The street address is intentionally synthetic and is not a real rentable property.",
+    "year_built": 1998
+  },
+  {
+    "building_id": "BLD-005",
+    "name": "Saint-Charles Demo Lofts",
+    "address": "505 Rue Exemple-Saint-Charles, Longueuil (fictional)",
+    "postal_code": "TEST-LGL-01",
+    "province": "Quebec",
+    "location_id": "LOC-004",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 64,
+    "amenities": [
+      "gym",
+      "lounge",
+      "elevator"
+    ],
+    "parking": "indoor",
+    "description": "Saint-Charles Demo Lofts is a fictional rental community created for search and recommendation testing. The property offers gym, lounge, elevator and a mix of homes designed for different household sizes. Its area is suitable for exploring neighbourhood-based search, amenities matching, and questions about building versus unit-level features. The street address is intentionally synthetic and is not a real rentable property.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-006",
+    "name": "Parc Demo Apartments",
+    "address": "606 Avenue Exemple-Parc, Longueuil (fictional)",
+    "postal_code": "TEST-LGL-02",
+    "province": "Quebec",
+    "location_id": "LOC-004",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 24,
+    "amenities": [
+      "shared garden",
+      "storage lockers"
+    ],
+    "parking": "outdoor",
+    "description": "Parc Demo Apartments is a fictional rental community created for search and recommendation testing. The property offers shared garden, storage lockers and a mix of homes designed for different household sizes. Its area is suitable for exploring neighbourhood-based search, amenities matching, and questions about building versus unit-level features. The street address is intentionally synthetic and is not a real rentable property.",
+    "year_built": 2005
+  },
+  {
+    "building_id": "BLD-007",
+    "name": "Plateau-Mont-Royal Courtyard Demo 1",
+    "address": "Fictional Demo Lane 100, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-005-1",
+    "province": "Quebec",
+    "location_id": "LOC-005",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 34,
+    "amenities": [
+      "courtyard",
+      "bike storage",
+      "package lockers"
+    ],
+    "parking": "none",
+    "description": "Plateau-Mont-Royal Courtyard Demo 1 is a completely fictional residential property in the Plateau-Mont-Royal area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes courtyard seating and quieter shared areas. Residents in the scenario can access courtyard, bike storage, package lockers. The surrounding area is associated with Parc La Fontaine and Avenue du Mont-Royal, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2016
+  },
+  {
+    "building_id": "BLD-008",
+    "name": "Plateau-Mont-Royal Loft Demo 2",
+    "address": "Fictional Demo Lane 107, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-005-2",
+    "province": "Quebec",
+    "location_id": "LOC-005",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 18,
+    "amenities": [
+      "coworking room",
+      "elevator",
+      "bike storage"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Plateau-Mont-Royal Loft Demo 2 is imagined as a building with a neighbourhood-scale feel in Plateau-Mont-Royal. The concept features taller ceilings and flexible shared work space, along with coworking room, elevator, bike storage. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Parc La Fontaine are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-009",
+    "name": "Mile End Garden Demo 1",
+    "address": "Fictional Demo Lane 120, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-006-1",
+    "province": "Quebec",
+    "location_id": "LOC-006",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 34,
+    "amenities": [
+      "garden",
+      "stroller storage",
+      "laundry room"
+    ],
+    "parking": "outdoor",
+    "description": "Mile End Garden Demo 1 is a completely fictional residential property in the Mile End area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes landscaped common spaces and family-oriented circulation. Residents in the scenario can access garden, stroller storage, laundry room. The surrounding area is associated with Parc du Portugal and Laurier Avenue, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-010",
+    "name": "Mile End Terrace Demo 2",
+    "address": "Fictional Demo Lane 127, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-006-2",
+    "province": "Quebec",
+    "location_id": "LOC-006",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 18,
+    "amenities": [
+      "rooftop terrace",
+      "resident lounge",
+      "elevator"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Mile End Terrace Demo 2 is imagined as a building with a neighbourhood-scale feel in Mile End. The concept features outdoor gathering areas and community rooms, along with rooftop terrace, resident lounge, elevator. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Parc du Portugal are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2021
+  },
+  {
+    "building_id": "BLD-011",
+    "name": "Verdun Atelier Demo 1",
+    "address": "Fictional Demo Lane 140, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-007-1",
+    "province": "Quebec",
+    "location_id": "LOC-007",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 48,
+    "amenities": [
+      "workshop room",
+      "bike storage",
+      "parcel lockers"
+    ],
+    "parking": "street",
+    "description": "Verdun Atelier Demo 1 is a completely fictional residential property in the Verdun area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes creative shared areas and practical storage. Residents in the scenario can access workshop room, bike storage, parcel lockers. The surrounding area is associated with Wellington Street and Parc Arthur-Therrien, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": null
+  },
+  {
+    "building_id": "BLD-012",
+    "name": "Verdun Harbour Demo 2",
+    "address": "Fictional Demo Lane 147, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-007-2",
+    "province": "Quebec",
+    "location_id": "LOC-007",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 12,
+    "amenities": [
+      "gym",
+      "elevator",
+      "rooftop terrace"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Verdun Harbour Demo 2 is imagined as a building with a neighbourhood-scale feel in Verdun. The concept features waterfront-inspired common areas and comfortable lobbies, along with gym, elevator, rooftop terrace. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Wellington Street are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2016
+  },
+  {
+    "building_id": "BLD-013",
+    "name": "Hochelaga-Maisonneuve House Demo 1",
+    "address": "Fictional Demo Lane 160, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-008-1",
+    "province": "Quebec",
+    "location_id": "LOC-008",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 18,
+    "amenities": [
+      "shared laundry",
+      "bike parking"
+    ],
+    "parking": "none",
+    "description": "Hochelaga-Maisonneuve House Demo 1 is a completely fictional residential property in the Hochelaga-Maisonneuve area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes smaller-scale entry and simple shared facilities. Residents in the scenario can access shared laundry, bike parking. The surrounding area is associated with Maisonneuve Market and Olympic Park, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-014",
+    "name": "Hochelaga-Maisonneuve Square Demo 2",
+    "address": "Fictional Demo Lane 167, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-008-2",
+    "province": "Quebec",
+    "location_id": "LOC-008",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 18,
+    "amenities": [
+      "elevator",
+      "accessible entrance",
+      "package lockers"
+    ],
+    "parking": "outdoor",
+    "description": "A synthetic rental development for AI evaluation, Hochelaga-Maisonneuve Square Demo 2 is imagined as a building with a neighbourhood-scale feel in Hochelaga-Maisonneuve. The concept features mixed household layouts with accessibility features, along with elevator, accessible entrance, package lockers. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Maisonneuve Market are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 1988
+  },
+  {
+    "building_id": "BLD-015",
+    "name": "Rosemont–La Petite-Patrie Courtyard Demo 1",
+    "address": "Fictional Demo Lane 180, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-009-1",
+    "province": "Quebec",
+    "location_id": "LOC-009",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 72,
+    "amenities": [
+      "courtyard",
+      "bike storage",
+      "package lockers"
+    ],
+    "parking": "none",
+    "description": "Rosemont–La Petite-Patrie Courtyard Demo 1 is a completely fictional residential property in the Rosemont–La Petite-Patrie area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes courtyard seating and quieter shared areas. Residents in the scenario can access courtyard, bike storage, package lockers. The surrounding area is associated with Jean-Talon Market and Parc Molson, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 1988
+  },
+  {
+    "building_id": "BLD-016",
+    "name": "Rosemont–La Petite-Patrie Loft Demo 2",
+    "address": "Fictional Demo Lane 187, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-009-2",
+    "province": "Quebec",
+    "location_id": "LOC-009",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 48,
+    "amenities": [
+      "coworking room",
+      "elevator",
+      "bike storage"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Rosemont–La Petite-Patrie Loft Demo 2 is imagined as a building with a neighbourhood-scale feel in Rosemont–La Petite-Patrie. The concept features taller ceilings and flexible shared work space, along with coworking room, elevator, bike storage. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Jean-Talon Market are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2021
+  },
+  {
+    "building_id": "BLD-017",
+    "name": "Saint-Henri Garden Demo 1",
+    "address": "Fictional Demo Lane 200, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-010-1",
+    "province": "Quebec",
+    "location_id": "LOC-010",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 48,
+    "amenities": [
+      "garden",
+      "stroller storage",
+      "laundry room"
+    ],
+    "parking": "outdoor",
+    "description": "Saint-Henri Garden Demo 1 is a completely fictional residential property in the Saint-Henri area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes landscaped common spaces and family-oriented circulation. Residents in the scenario can access garden, stroller storage, laundry room. The surrounding area is associated with Atwater Market and Lachine Canal, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2016
+  },
+  {
+    "building_id": "BLD-018",
+    "name": "Saint-Henri Terrace Demo 2",
+    "address": "Fictional Demo Lane 207, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-010-2",
+    "province": "Quebec",
+    "location_id": "LOC-010",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 96,
+    "amenities": [
+      "rooftop terrace",
+      "resident lounge",
+      "elevator"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Saint-Henri Terrace Demo 2 is imagined as a building with a neighbourhood-scale feel in Saint-Henri. The concept features outdoor gathering areas and community rooms, along with rooftop terrace, resident lounge, elevator. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Atwater Market are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-019",
+    "name": "Villeray Atelier Demo 1",
+    "address": "Fictional Demo Lane 220, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-011-1",
+    "province": "Quebec",
+    "location_id": "LOC-011",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 48,
+    "amenities": [
+      "workshop room",
+      "bike storage",
+      "parcel lockers"
+    ],
+    "parking": "street",
+    "description": "Villeray Atelier Demo 1 is a completely fictional residential property in the Villeray area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes creative shared areas and practical storage. Residents in the scenario can access workshop room, bike storage, parcel lockers. The surrounding area is associated with Jarry Park and Jean-Talon Market, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-020",
+    "name": "Villeray Harbour Demo 2",
+    "address": "Fictional Demo Lane 227, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-011-2",
+    "province": "Quebec",
+    "location_id": "LOC-011",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 12,
+    "amenities": [
+      "gym",
+      "elevator",
+      "rooftop terrace"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Villeray Harbour Demo 2 is imagined as a building with a neighbourhood-scale feel in Villeray. The concept features waterfront-inspired common areas and comfortable lobbies, along with gym, elevator, rooftop terrace. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Jarry Park are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2004
+  },
+  {
+    "building_id": "BLD-021",
+    "name": "Outremont House Demo 1",
+    "address": "Fictional Demo Lane 240, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-012-1",
+    "province": "Quebec",
+    "location_id": "LOC-012",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 72,
+    "amenities": [
+      "shared laundry",
+      "bike parking"
+    ],
+    "parking": "none",
+    "description": "Outremont House Demo 1 is a completely fictional residential property in the Outremont area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes smaller-scale entry and simple shared facilities. Residents in the scenario can access shared laundry, bike parking. The surrounding area is associated with Parc Outremont and Bernard Avenue, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2016
+  },
+  {
+    "building_id": "BLD-022",
+    "name": "Outremont Square Demo 2",
+    "address": "Fictional Demo Lane 247, Montréal (TEST ADDRESS)",
+    "postal_code": "TEST-012-2",
+    "province": "Quebec",
+    "location_id": "LOC-012",
+    "greater_region": "Greater Montreal",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 18,
+    "amenities": [
+      "elevator",
+      "accessible entrance",
+      "package lockers"
+    ],
+    "parking": "outdoor",
+    "description": "A synthetic rental development for AI evaluation, Outremont Square Demo 2 is imagined as a building with a neighbourhood-scale feel in Outremont. The concept features mixed household layouts with accessibility features, along with elevator, accessible entrance, package lockers. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Parc Outremont are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2004
+  },
+  {
+    "building_id": "BLD-023",
+    "name": "Nørrebro Courtyard Demo 1",
+    "address": "Fictional Demo Lane 260, København (TEST ADDRESS)",
+    "postal_code": "TEST-013-1",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-013",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 18,
+    "amenities": [
+      "courtyard",
+      "bike storage",
+      "package lockers"
+    ],
+    "parking": "none",
+    "description": "Nørrebro Courtyard Demo 1 is a completely fictional residential property in the Nørrebro area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes courtyard seating and quieter shared areas. Residents in the scenario can access courtyard, bike storage, package lockers. The surrounding area is associated with Assistens Cemetery and Superkilen, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2021
+  },
+  {
+    "building_id": "BLD-024",
+    "name": "Nørrebro Loft Demo 2",
+    "address": "Fictional Demo Lane 267, København (TEST ADDRESS)",
+    "postal_code": "TEST-013-2",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-013",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 96,
+    "amenities": [
+      "coworking room",
+      "elevator",
+      "bike storage"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Nørrebro Loft Demo 2 is imagined as a building with a neighbourhood-scale feel in Nørrebro. The concept features taller ceilings and flexible shared work space, along with coworking room, elevator, bike storage. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Assistens Cemetery are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2016
+  },
+  {
+    "building_id": "BLD-025",
+    "name": "Vesterbro Garden Demo 1",
+    "address": "Fictional Demo Lane 280, København (TEST ADDRESS)",
+    "postal_code": "TEST-014-1",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-014",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 48,
+    "amenities": [
+      "garden",
+      "stroller storage",
+      "laundry room"
+    ],
+    "parking": "outdoor",
+    "description": "Vesterbro Garden Demo 1 is a completely fictional residential property in the Vesterbro area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes landscaped common spaces and family-oriented circulation. Residents in the scenario can access garden, stroller storage, laundry room. The surrounding area is associated with Kødbyen and Enghave Plads, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 1988
+  },
+  {
+    "building_id": "BLD-026",
+    "name": "Vesterbro Terrace Demo 2",
+    "address": "Fictional Demo Lane 287, København (TEST ADDRESS)",
+    "postal_code": "TEST-014-2",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-014",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 96,
+    "amenities": [
+      "rooftop terrace",
+      "resident lounge",
+      "elevator"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Vesterbro Terrace Demo 2 is imagined as a building with a neighbourhood-scale feel in Vesterbro. The concept features outdoor gathering areas and community rooms, along with rooftop terrace, resident lounge, elevator. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Kødbyen are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-027",
+    "name": "Østerbro Atelier Demo 1",
+    "address": "Fictional Demo Lane 300, København (TEST ADDRESS)",
+    "postal_code": "TEST-015-1",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-015",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 72,
+    "amenities": [
+      "workshop room",
+      "bike storage",
+      "parcel lockers"
+    ],
+    "parking": "street",
+    "description": "Østerbro Atelier Demo 1 is a completely fictional residential property in the Østerbro area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes creative shared areas and practical storage. Residents in the scenario can access workshop room, bike storage, parcel lockers. The surrounding area is associated with Fælledparken and The Lakes, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-028",
+    "name": "Østerbro Harbour Demo 2",
+    "address": "Fictional Demo Lane 307, København (TEST ADDRESS)",
+    "postal_code": "TEST-015-2",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-015",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 96,
+    "amenities": [
+      "gym",
+      "elevator",
+      "rooftop terrace"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Østerbro Harbour Demo 2 is imagined as a building with a neighbourhood-scale feel in Østerbro. The concept features waterfront-inspired common areas and comfortable lobbies, along with gym, elevator, rooftop terrace. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Fælledparken are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2016
+  },
+  {
+    "building_id": "BLD-029",
+    "name": "Amagerbro House Demo 1",
+    "address": "Fictional Demo Lane 320, København (TEST ADDRESS)",
+    "postal_code": "TEST-016-1",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-016",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 96,
+    "amenities": [
+      "shared laundry",
+      "bike parking"
+    ],
+    "parking": "none",
+    "description": "Amagerbro House Demo 1 is a completely fictional residential property in the Amagerbro area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes smaller-scale entry and simple shared facilities. Residents in the scenario can access shared laundry, bike parking. The surrounding area is associated with Amagerbrogade and Amager Strandpark, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-030",
+    "name": "Amagerbro Square Demo 2",
+    "address": "Fictional Demo Lane 327, København (TEST ADDRESS)",
+    "postal_code": "TEST-016-2",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-016",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 18,
+    "amenities": [
+      "elevator",
+      "accessible entrance",
+      "package lockers"
+    ],
+    "parking": "outdoor",
+    "description": "A synthetic rental development for AI evaluation, Amagerbro Square Demo 2 is imagined as a building with a neighbourhood-scale feel in Amagerbro. The concept features mixed household layouts with accessibility features, along with elevator, accessible entrance, package lockers. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Amagerbrogade are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2004
+  },
+  {
+    "building_id": "BLD-031",
+    "name": "Frederiksberg Courtyard Demo 1",
+    "address": "Fictional Demo Lane 340, København (TEST ADDRESS)",
+    "postal_code": "TEST-017-1",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-017",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 96,
+    "amenities": [
+      "courtyard",
+      "bike storage",
+      "package lockers"
+    ],
+    "parking": "none",
+    "description": "Frederiksberg Courtyard Demo 1 is a completely fictional residential property in the Frederiksberg area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes courtyard seating and quieter shared areas. Residents in the scenario can access courtyard, bike storage, package lockers. The surrounding area is associated with Frederiksberg Gardens and Frederiksberg Centret, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": null
+  },
+  {
+    "building_id": "BLD-032",
+    "name": "Frederiksberg Loft Demo 2",
+    "address": "Fictional Demo Lane 347, København (TEST ADDRESS)",
+    "postal_code": "TEST-017-2",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-017",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 48,
+    "amenities": [
+      "coworking room",
+      "elevator",
+      "bike storage"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Frederiksberg Loft Demo 2 is imagined as a building with a neighbourhood-scale feel in Frederiksberg. The concept features taller ceilings and flexible shared work space, along with coworking room, elevator, bike storage. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Frederiksberg Gardens are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2016
+  },
+  {
+    "building_id": "BLD-033",
+    "name": "Valby Garden Demo 1",
+    "address": "Fictional Demo Lane 360, København (TEST ADDRESS)",
+    "postal_code": "TEST-018-1",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-018",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 34,
+    "amenities": [
+      "garden",
+      "stroller storage",
+      "laundry room"
+    ],
+    "parking": "outdoor",
+    "description": "Valby Garden Demo 1 is a completely fictional residential property in the Valby area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes landscaped common spaces and family-oriented circulation. Residents in the scenario can access garden, stroller storage, laundry room. The surrounding area is associated with Valby Park and Spinderiet, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2016
+  },
+  {
+    "building_id": "BLD-034",
+    "name": "Valby Terrace Demo 2",
+    "address": "Fictional Demo Lane 367, København (TEST ADDRESS)",
+    "postal_code": "TEST-018-2",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-018",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 34,
+    "amenities": [
+      "rooftop terrace",
+      "resident lounge",
+      "elevator"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Valby Terrace Demo 2 is imagined as a building with a neighbourhood-scale feel in Valby. The concept features outdoor gathering areas and community rooms, along with rooftop terrace, resident lounge, elevator. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Valby Park are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-035",
+    "name": "Nordhavn Atelier Demo 1",
+    "address": "Fictional Demo Lane 380, København (TEST ADDRESS)",
+    "postal_code": "TEST-019-1",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-019",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 18,
+    "amenities": [
+      "workshop room",
+      "bike storage",
+      "parcel lockers"
+    ],
+    "parking": "street",
+    "description": "Nordhavn Atelier Demo 1 is a completely fictional residential property in the Nordhavn area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes creative shared areas and practical storage. Residents in the scenario can access workshop room, bike storage, parcel lockers. The surrounding area is associated with Århusgade quarter and Waterfront promenades, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-036",
+    "name": "Nordhavn Harbour Demo 2",
+    "address": "Fictional Demo Lane 387, København (TEST ADDRESS)",
+    "postal_code": "TEST-019-2",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-019",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 72,
+    "amenities": [
+      "gym",
+      "elevator",
+      "rooftop terrace"
+    ],
+    "parking": "indoor",
+    "description": "A synthetic rental development for AI evaluation, Nordhavn Harbour Demo 2 is imagined as a building with a neighbourhood-scale feel in Nordhavn. The concept features waterfront-inspired common areas and comfortable lobbies, along with gym, elevator, rooftop terrace. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Århusgade quarter are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-037",
+    "name": "Islands Brygge House Demo 1",
+    "address": "Fictional Demo Lane 400, København (TEST ADDRESS)",
+    "postal_code": "TEST-020-1",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-020",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 48,
+    "amenities": [
+      "shared laundry",
+      "bike parking"
+    ],
+    "parking": "none",
+    "description": "Islands Brygge House Demo 1 is a completely fictional residential property in the Islands Brygge area, designed to test apartment recommendation systems rather than represent an actual address. Its concept emphasizes smaller-scale entry and simple shared facilities. Residents in the scenario can access shared laundry, bike parking. The surrounding area is associated with Islands Brygge Harbour Bath and Amager Fælled, though no precise distance is asserted. Test records deliberately mix amenity availability, parking policies and layouts across the building's unit listings.",
+    "year_built": 2024
+  },
+  {
+    "building_id": "BLD-038",
+    "name": "Islands Brygge Square Demo 2",
+    "address": "Fictional Demo Lane 407, København (TEST ADDRESS)",
+    "postal_code": "TEST-020-2",
+    "province": "Capital Region of Denmark",
+    "location_id": "LOC-020",
+    "greater_region": "Greater Copenhagen",
+    "longitude": null,
+    "latitude": null,
+    "number_of_units": 34,
+    "amenities": [
+      "elevator",
+      "accessible entrance",
+      "package lockers"
+    ],
+    "parking": "outdoor",
+    "description": "A synthetic rental development for AI evaluation, Islands Brygge Square Demo 2 is imagined as a building with a neighbourhood-scale feel in Islands Brygge. The concept features mixed household layouts with accessibility features, along with elevator, accessible entrance, package lockers. It provides plausible housing inventory for checking how an assistant compares shared building facilities with private-unit inclusions. References to Islands Brygge Harbour Bath are general local context, not a guarantee of walking distance. Neither the address nor its rental inventory exists in the real world.",
+    "year_built": 2004
+  }
+]

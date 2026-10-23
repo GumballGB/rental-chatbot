@@ -1,0 +1,390 @@
+[
+  {
+    "location_id": "LOC-001",
+    "name": "Griffintown",
+    "alternative_names": [
+      "Griffin Town"
+    ],
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Lachine Canal",
+      "École de technologie supérieure (ÉTS)"
+    ],
+    "nearby_transportation": [
+      "Bonaventure metro station",
+      "STM bus service"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-002",
+    "name": "Downtown Montreal",
+    "alternative_names": [
+      "Centre-ville de Montréal",
+      "Ville-Marie"
+    ],
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Concordia University Sir George Williams Campus",
+      "Sainte-Catherine Street"
+    ],
+    "nearby_transportation": [
+      "Guy-Concordia metro station",
+      "Peel metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-003",
+    "name": "Côte-des-Neiges–Notre-Dame-de-Grâce",
+    "alternative_names": [
+      "NDG",
+      "Notre-Dame-de-Grâce"
+    ],
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Concordia University Loyola Campus",
+      "Monkland Village"
+    ],
+    "nearby_transportation": [
+      "Vendôme metro station",
+      "STM bus service"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-004",
+    "name": "Vieux-Longueuil",
+    "alternative_names": [
+      "Old Longueuil"
+    ],
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Parc Michel-Chartrand",
+      "Rue Saint-Charles Ouest"
+    ],
+    "nearby_transportation": [
+      "Longueuil–Université-de-Sherbrooke metro station",
+      "RTL bus service"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-005",
+    "name": "Plateau-Mont-Royal",
+    "alternative_names": [
+      "The Plateau",
+      "Le Plateau"
+    ],
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Parc La Fontaine",
+      "Avenue du Mont-Royal",
+      "Saint-Denis Street"
+    ],
+    "nearby_transportation": [
+      "Mont-Royal metro station",
+      "Laurier metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-006",
+    "name": "Mile End",
+    "alternative_names": [
+      "Mile-End"
+    ],
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Parc du Portugal",
+      "Laurier Avenue",
+      "Saint-Viateur Street"
+    ],
+    "nearby_transportation": [
+      "STM bus routes",
+      "Laurier metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-007",
+    "name": "Verdun",
+    "alternative_names": null,
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Wellington Street",
+      "Parc Arthur-Therrien",
+      "St. Lawrence River waterfront"
+    ],
+    "nearby_transportation": [
+      "De l’Église metro station",
+      "Verdun metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-008",
+    "name": "Hochelaga-Maisonneuve",
+    "alternative_names": [
+      "HoMa"
+    ],
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Maisonneuve Market",
+      "Olympic Park",
+      "Promenade Ontario"
+    ],
+    "nearby_transportation": [
+      "Joliette metro station",
+      "Pie-IX metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-009",
+    "name": "Rosemont–La Petite-Patrie",
+    "alternative_names": [
+      "Rosemont",
+      "La Petite-Patrie"
+    ],
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Jean-Talon Market",
+      "Parc Molson",
+      "Plaza St-Hubert"
+    ],
+    "nearby_transportation": [
+      "Beaubien metro station",
+      "Jean-Talon metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-010",
+    "name": "Saint-Henri",
+    "alternative_names": [
+      "St-Henri"
+    ],
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Atwater Market",
+      "Lachine Canal",
+      "Notre-Dame Street West"
+    ],
+    "nearby_transportation": [
+      "Place-Saint-Henri metro station",
+      "Lionel-Groulx metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-011",
+    "name": "Villeray",
+    "alternative_names": null,
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Jarry Park",
+      "Jean-Talon Market",
+      "Jarry Street"
+    ],
+    "nearby_transportation": [
+      "Jarry metro station",
+      "Jean-Talon metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-012",
+    "name": "Outremont",
+    "alternative_names": null,
+    "country": "Canada",
+    "province": "Quebec",
+    "nearby_landmarks": [
+      "Parc Outremont",
+      "Bernard Avenue",
+      "Mount Royal foothills"
+    ],
+    "nearby_transportation": [
+      "Outremont metro station",
+      "Édouard-Montpetit metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-013",
+    "name": "Nørrebro",
+    "alternative_names": [
+      "Norrebro"
+    ],
+    "country": "Denmark",
+    "province": "Capital Region of Denmark",
+    "nearby_landmarks": [
+      "Assistens Cemetery",
+      "Superkilen",
+      "Nørrebrogade"
+    ],
+    "nearby_transportation": [
+      "Nørrebro station",
+      "Nørrebros Runddel metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-014",
+    "name": "Vesterbro",
+    "alternative_names": null,
+    "country": "Denmark",
+    "province": "Capital Region of Denmark",
+    "nearby_landmarks": [
+      "Kødbyen",
+      "Enghave Plads",
+      "Sønder Boulevard"
+    ],
+    "nearby_transportation": [
+      "Enghave Plads metro station",
+      "Copenhagen Central Station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-015",
+    "name": "Østerbro",
+    "alternative_names": [
+      "Osterbro"
+    ],
+    "country": "Denmark",
+    "province": "Capital Region of Denmark",
+    "nearby_landmarks": [
+      "Fælledparken",
+      "The Lakes",
+      "Svanemøllen waterfront"
+    ],
+    "nearby_transportation": [
+      "Trianglen metro station",
+      "Østerport station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-016",
+    "name": "Amagerbro",
+    "alternative_names": [
+      "Amager"
+    ],
+    "country": "Denmark",
+    "province": "Capital Region of Denmark",
+    "nearby_landmarks": [
+      "Amagerbrogade",
+      "Amager Strandpark",
+      "Christianshavn canals"
+    ],
+    "nearby_transportation": [
+      "Amagerbro metro station",
+      "Lergravsparken metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-017",
+    "name": "Frederiksberg",
+    "alternative_names": null,
+    "country": "Denmark",
+    "province": "Capital Region of Denmark",
+    "nearby_landmarks": [
+      "Frederiksberg Gardens",
+      "Frederiksberg Centret",
+      "Søndermarken"
+    ],
+    "nearby_transportation": [
+      "Frederiksberg metro station",
+      "Fasanvej metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-018",
+    "name": "Valby",
+    "alternative_names": null,
+    "country": "Denmark",
+    "province": "Capital Region of Denmark",
+    "nearby_landmarks": [
+      "Valby Park",
+      "Spinderiet",
+      "Carlsberg district"
+    ],
+    "nearby_transportation": [
+      "Valby station",
+      "Carlsberg station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-019",
+    "name": "Nordhavn",
+    "alternative_names": [
+      "North Harbour"
+    ],
+    "country": "Denmark",
+    "province": "Capital Region of Denmark",
+    "nearby_landmarks": [
+      "Århusgade quarter",
+      "Waterfront promenades",
+      "Orientkaj"
+    ],
+    "nearby_transportation": [
+      "Nordhavn station",
+      "Orientkaj metro station"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  },
+  {
+    "location_id": "LOC-020",
+    "name": "Islands Brygge",
+    "alternative_names": [
+      "Bryggen"
+    ],
+    "country": "Denmark",
+    "province": "Capital Region of Denmark",
+    "nearby_landmarks": [
+      "Islands Brygge Harbour Bath",
+      "Amager Fælled",
+      "Harbour promenade"
+    ],
+    "nearby_transportation": [
+      "Islands Brygge metro station",
+      "Bus services toward central Copenhagen"
+    ],
+    "center_longitude": null,
+    "center_latitude": null
+  }
+]

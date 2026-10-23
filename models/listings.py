@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import Literal, Date
+from typing import Literal
+from datetime import date as Date
 
 class Listing(BaseModel):
 
@@ -7,6 +8,7 @@ class Listing(BaseModel):
     listing_id: str
     listing_name: str
     monthly_rent: int = Field(ge=0, description="Monthly rent must be a non-negative integer.")
+    currency: Literal["CAD", "DKK"]
 
     # listing details
     bedrooms: float = Field(ge=0, description="Number of bedrooms must be a non-negative float.")
