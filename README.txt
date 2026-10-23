@@ -26,6 +26,11 @@ You need to fill the Anthropic key placeholder
 
 To deactivate the venv, just type 'deactivate'
 
+-**-**- TESTING -**-**-
+
+To run testing, make sure you pip install the requirements-dev.txt file
+
+python -m pytest
 
 
 
