@@ -71,6 +71,8 @@ class JsonStore:
         with open(file_path, 'r') as f:
             return json.load(f)
 
+    # Main Getters
+
     def get_listing(self, listing_id: str) -> Listing:
         """
         Get a listing by its ID.
@@ -109,4 +111,47 @@ class JsonStore:
             return self.locations[location_id]
         else:
             raise NotFoundError(f"Location with id {location_id} not found.")
-        
+
+    # Return the list of listing as objects
+    def get_listing_object_per_building(self, building_id) -> dict[str, Listing]:
+        """
+        Get the number of listings per building.
+
+        :return: A dictionary where keys are listing IDs and values are Listing objects for the given building ID.
+        :raises NotFoundError: If the building with the given ID does not exist.
+        """
+        listings_per_building = {}
+
+        # Check if the building exists
+        if building_id not in self.buildings:
+            raise NotFoundError(f"Building with id {building_id} not found.")
+
+        for listing in self.listings.values():
+
+            if listing.building_id == building_id:
+                listings_per_building[listing.listing_id] = listing
+
+        return listings_per_building
+
+    # Return the list of buildings in a location as objects
+    def get_building_object_per_location(self, location_id) -> dict[str, Building]:
+        """
+        Get the number of buildings per location.
+
+        :return: A dictionary where keys are building IDs and values are Building objects for the given location ID.
+        :raises NotFoundError: If the location with the given ID does not exist.
+        """
+        buildings_per_location = {}
+
+        # Check if the location exists
+        if location_id not in self.locations:
+            raise NotFoundError(f"Location with id {location_id} not found.")
+
+        for building in self.buildings.values():
+
+            if building.location_id == location_id:
+                buildings_per_location[building.building_id] = building
+
+        return buildings_per_location
+
+

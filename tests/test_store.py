@@ -62,3 +62,39 @@ def test_get_faulty_listing():
     assert str(exc_info.value) == (
         "Listing with id LST-999 not found."
     )
+
+def test_get_happy_building():
+
+    store = JsonStore()
+
+    building_id = store.get_building("BLD-001")
+    assert building_id.building_id == "BLD-001"
+
+def test_get_faulty_building():
+
+    store = JsonStore()
+
+    with pytest.raises(NotFoundError) as exc_info:
+        store.get_building("BLD-999")
+
+    assert str(exc_info.value) == (
+        "Building with id BLD-999 not found."
+    )
+
+def test_get_happy_location():
+    
+    store = JsonStore()
+
+    location_id = store.get_location("LOC-001")
+    assert location_id.location_id == "LOC-001"
+
+def test_get_faulty_location():
+
+    store = JsonStore()
+
+    with pytest.raises(NotFoundError) as exc_info:
+        store.get_location("LOC-999")
+
+    assert str(exc_info.value) == (
+        "Location with id LOC-999 not found."
+    )
