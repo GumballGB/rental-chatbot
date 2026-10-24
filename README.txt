@@ -12,6 +12,13 @@ To setup this project for first-time users, you need to run the following comman
 
 python3.12 -m venv .venv
 
+If on LINUX, install the python venv w/ this line (it works on my computer)
+sudo apt install python3-venv python3-pip
+
+Then
+
+python3 -m venv .venv
+
 2. Activate the virtual environment with:
 
 source .venv/bin/activate
@@ -19,6 +26,7 @@ source .venv/bin/activate
 3. Install the dependencies, it is found in a requirements.txt.
 
 pip install -r requirements.txt
+pip install -r requirements-dev.txt
 
 4. Set up the key
 This project uses Anthropic, copy the '.env.example' code and paste it into a new file called '.env'

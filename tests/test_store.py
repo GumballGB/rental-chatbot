@@ -25,6 +25,21 @@ def count_num():
 
     return num_listings, num_buildings, num_locations
 
+def count_num_listings_per_building(building_id):
+
+    with open('data/listings.json') as f:
+        listings_data = json.load(f)
+        num_listings = sum(1 for listing in listings_data if listing['building_id'] == building_id)
+
+    return num_listings
+
+def count_num_buildings_per_location(location_id):
+
+    with open('data/buildings.json') as f:
+        buildings_data = json.load(f)
+        num_buildings = sum(1 for building in buildings_data if building['location_id'] == location_id)
+
+    return num_buildings
 
 def test_store():
 
@@ -94,6 +109,68 @@ def test_get_faulty_location():
 
     with pytest.raises(NotFoundError) as exc_info:
         store.get_location("LOC-999")
+
+    assert str(exc_info.value) == (
+        "Location with id LOC-999 not found."
+    )
+
+# Test getting all listings as objects from a building
+def test_get_listings_from_building():
+
+    store = JsonStore()
+
+    # This will be hardcoded for now, assuming "BLD-001" exists in the test data
+    building_id = "BLD-001"
+
+    listings = store.get_listing_object_per_building(building_id)
+
+    for listing in listings.values():
+        assert listing.building_id == building_id
+
+    # Check if the number of listings matches the expected count
+    expected_num_listings = count_num_listings_per_building(building_id)
+    assert len(listings) == expected_num_listings
+
+
+# Test getting all listings as objects from a non-existent building
+def test_get_listings_from_nonexistent_building():
+
+    store = JsonStore()
+
+    building_id = "BLD-999"
+
+    with pytest.raises(NotFoundError) as exc_info:
+        store.get_listing_object_per_building(building_id)
+
+    assert str(exc_info.value) == (
+        "Building with id BLD-999 not found."
+    )
+
+# Test getting buildings from a location
+def test_get_buildings_from_location():
+
+    store = JsonStore()
+
+    location_id = "LOC-001"
+
+    buildings = store.get_building_object_per_location(location_id)
+
+    for building in buildings.values():
+        assert building.location_id == location_id
+
+    # Check if the number of buildings matches the expected count
+    expected_num_buildings = count_num_buildings_per_location(location_id)
+    assert len(buildings) == expected_num_buildings
+
+# Test getting buildings from a non-existent location
+def test_get_buildings_from_nonexistent_location():
+
+    store = JsonStore()
+
+    location_id = "LOC-999"
+
+    with pytest.raises(NotFoundError) as exc_info:
+        store.get_building_object_per_location(location_id)
 
     assert str(exc_info.value) == (
         "Location with id LOC-999 not found."
