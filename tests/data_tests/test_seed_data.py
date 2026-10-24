@@ -9,6 +9,7 @@ import pytest
 from pydantic import ValidationError
 
 from models.building import Building
+from models.enquiry import Enquiry
 from models.listings import Listing
 from models.location import Location
 
@@ -59,12 +60,27 @@ def test_seed_listings_data():
 
             assert False, f"Listings data validation failed: {e}, Listing ID: {listing_id}"
 
+def test_seed_enquiry_data():
+
+    with open('data/unit_enquiries.json') as f:
+        enquiry_data = json.load(f)
+
+    for enquiry in enquiry_data:
+        try:
+            Enquiry(**enquiry)
+        except ValidationError as e:
+
+            enquiry_id = enquiry.get('enquiry_id')
+
+            assert False, f"Enquiry data validation failed: {e}, Enquiry ID: {enquiry_id}"
+
 @pytest.mark.parametrize(
     "filename, id_field",
     [
         ("locations.json", "location_id"),
         ("buildings.json", "building_id"),
         ("listings.json", "listing_id"),
+        ("unit_enquiries.json", "enquiry_id"),
     ]
 )
 
@@ -97,6 +113,7 @@ def test_seed_data_duplicates(filename, id_field):
         ("locations.json", "location_id"),
         ("buildings.json", "building_id"),
         ("listings.json", "listing_id"),
+        ("unit_enquiries.json", "enquiry_id"),
     ]
 )
 def test_seed_data_id_exists(filename, id_field):
@@ -146,3 +163,23 @@ def test_listing_building_referential_integrity():
             f"Listing {listing['listing_id']} references a non-existent "
             f"building_id: {listing_building_id}"
         )
+
+# Check for referential integrity between unit enquiries and listings
+# Note that some unit enquiries may not have a listing_id if the user did not specify it, but we still want to check the ones that do.
+def test_unit_enquiry_listing_referential_integrity():
+    with open("data/unit_enquiries.json") as f:
+        enquiry_data = json.load(f)
+
+    with open("data/listings.json") as f:
+        listings_data = json.load(f)
+
+    listing_ids = {listing["listing_id"] for listing in listings_data}
+
+    for enquiry in enquiry_data:
+        enquiry_listing_id = enquiry.get("listing_id")
+
+        if enquiry_listing_id is not None:
+            assert enquiry_listing_id in listing_ids, (
+                f"Unit enquiry {enquiry['enquiry_id']} references a non-existent "
+                f"listing_id: {enquiry_listing_id}"
+            )

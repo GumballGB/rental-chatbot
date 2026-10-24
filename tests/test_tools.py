@@ -5,6 +5,7 @@ import json
 from core.store import JsonStore
 from core.tools import get_listing
 
+
 # Happy path test for get_listing, take listing LST-001
 def test_get_listing_happy_path():
     store = JsonStore()
