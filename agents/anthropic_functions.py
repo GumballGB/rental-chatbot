@@ -1,15 +1,19 @@
+import datetime
 import json
 import os
+import uuid
 
 from anthropic import Anthropic
 
+from core import store
+from models.enquiry import Enquiry
 from models.unit_enquiry import UnitEnquiry
 
 SYSTEM_PROMPT = """
 You extract information from rental unit enquiries.
 
 Return only a JSON object with these fields:
-name, email, phone, move_in_date, budget, message, declined_fields.
+name, email, phone, move_in_date, budget, message, listing, declined_fields.
 
 Rules:
 - Include all fields.
@@ -17,6 +21,7 @@ Rules:
 - budget must be an integer or null.
 - declined_fields must be an array of field names that
   the user has explicitly refused to provide.
+- Try to find the desired listing name or building name of the enquiry
 - Extract information from the entire conversation.
 - Preserve previously supplied information.
 - If a user corrects a value, use the latest value.
@@ -97,6 +102,7 @@ def get_response_unit_enquiry(client):
         "move_in_date": "When would you like to move in?",
         "budget": "What is your monthly budget?",
         "message": "What are you looking for in a rental unit?",
+        "listing_id": "What listing are you interested in?"
     }
 
     while(True):
@@ -115,6 +121,26 @@ def get_response_unit_enquiry(client):
         
         # if nothing is missing, finish and break the loop, otherwise ask for the missing fields
         if not missing_fields:
+
+            # The unit enquiry is complete, but we still need to populate 
+            # some additional fields like enquiry_id, received_date, and budget_currency.
+            # Todo: probably make a helper function to avoid code monster
+
+            data["enquiry_id"] = f"ENQ-{uuid.uuid4()}"
+            data["received_date"] = str(datetime.date.today())
+            data["listing_id"] = data.get("listing_id")
+            data["budget_currency"] = None
+
+            # this will not work for now
+            data["listing_id"] = data.get("listing_id")
+            listing_id = data["listing_id"]
+            listing = store.get_listing(listing_id)
+            building = store.get_building(listing.building_id)
+            data["budget_currency"] = store.get_listing(listing_id).currency
+
+
+            enquiry = Enquiry(**data) # created enquiries have uuid IDs instead
+
             return enquiry
 
         # Prepare to ask for the missing fields, this is not AI
@@ -140,7 +166,6 @@ def get_response_unit_enquiry(client):
         })
 
         # At this stage, the AI will process the next message with some context
-
 
 
 def get_usage(client):
