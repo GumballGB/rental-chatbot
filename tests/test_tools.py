@@ -2,8 +2,14 @@
 
 import json
 
-from core.store import JsonStore
-from core.tools import get_building, get_listing, run_tool
+from core.store import JsonStore, normalize_name
+from core.tools import (
+    get_building,
+    get_listing,
+    get_location_by_name,
+    run_tool,
+    search_listings,
+)
 
 # Pretty much all test uses JsonStore, so let's initialize it first
 # @pytest.fixture
@@ -106,3 +112,91 @@ def test_run_tool_unknown_tool():
 
     assert "error" in result_json
     assert result_json["error"] == "Tool unknown_tool not found."
+
+# Test for get_location_by_name with an alternative name
+def test_get_location_by_alternative_name():
+    result = get_location_by_name(JsonStore(), "rosemont")
+    result_json = json.loads(result)
+
+    assert result_json["location_id"] == "LOC-009"
+    assert result_json["name"] == "Rosemont–La Petite-Patrie"
+
+# Test a location with an accent
+def test_get_location_with_accent():
+    result = get_location_by_name(JsonStore(), "Montreal")
+    result_json = json.loads(result)
+
+    assert normalize_name("Montréal") == "montreal"
+    assert result_json["location_id"] == "LOC-002"
+    assert result_json["name"] == "Downtown Montreal"
+
+# Test for search_listings by location and rent range
+def test_search_listings_by_location_and_rent_range():
+    result = search_listings(
+        JsonStore(),
+        location_name="Verdun",
+        min_rent=1500,
+        max_rent=1700,
+        currency="CAD",
+    )
+    result_json = json.loads(result)
+
+    assert result_json["count"] == 1
+    assert result_json["listings"][0]["listing_id"] == "LST-037"
+    assert result_json["listings"][0]["monthly_rent"] == 1655
+    assert result_json["listings"][0]["location_name"] == "Verdun"
+
+
+def test_search_listings_requires_currency_for_rent_filter():
+    result = search_listings(JsonStore(), max_rent=9000, limit=100)
+    result_json = json.loads(result)
+
+    assert result_json == {
+        "error": "currency is required when filtering or sorting by rent."
+    }
+
+
+def test_search_listings_filters_currency_and_clamps_limit():
+    result = search_listings(
+        JsonStore(),
+        max_rent=9000,
+        currency="CAD",
+        limit=100,
+    )
+    result_json = json.loads(result)
+
+    assert result_json["count"] == 6
+    assert all(
+        listing["currency"] == "CAD"
+        for listing in result_json["listings"]
+    )
+
+
+def test_search_listings_requires_currency_for_rent_sorting():
+    result = search_listings(JsonStore(), sort_by="rent_asc")
+
+    assert json.loads(result) == {
+        "error": "currency is required when filtering or sorting by rent."
+    }
+
+
+def test_search_listings_sorts_all_matches_before_limit():
+    store = JsonStore()
+    result = search_listings(
+        store,
+        currency="CAD",
+        sort_by="rent_asc",
+        limit=6,
+    )
+    result_json = json.loads(result)
+    expected_rents = sorted(
+        listing.monthly_rent
+        for listing in store.listings.values()
+        if listing.currency == "CAD"
+        and listing.availability_status == "available"
+    )[:6]
+
+    assert [
+        listing["monthly_rent"]
+        for listing in result_json["listings"]
+    ] == expected_rents
