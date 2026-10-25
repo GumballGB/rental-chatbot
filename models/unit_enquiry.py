@@ -12,3 +12,4 @@ class UnitEnquiry(BaseModel):
     move_in_date: str | None = None
     budget: int | None = None
     message: str | None = None
+    listing_id: str | None = None
