@@ -101,6 +101,7 @@ def run_tool(tool_name: str, store: JsonStore, **kwargs) -> str:
         tool_name (str): The name of the tool to run.
         store (JsonStore): The JSON store instance.
         **kwargs: Additional keyword arguments to pass to the tool function.
+        For example this could be the listing_id or building_id depending on the tool.
 
     Returns:
         str: The JSON string result of the tool execution or an error message.
@@ -111,4 +112,13 @@ def run_tool(tool_name: str, store: JsonStore, **kwargs) -> str:
     
     tool_func = LOOKUP_DICT[tool_name]
 
-    return tool_func(store, **kwargs)
+    # Every tool function have their own required arguments, which are passed via **kwargs
+
+    try: 
+
+        result = tool_func(store, **kwargs)
+
+        return result
+    except TypeError as e:
+        
+        return json.dumps({"error": str(e)})
