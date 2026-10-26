@@ -81,6 +81,22 @@ def test_evidence_rejects_empty_quote():
         )
 
 
+def test_evidence_rejects_too_short_quote():
+    with pytest.raises(ValidationError):
+        Recommendation(
+            referred_enquiry_id="ENQ-001",
+            label="genuine",
+            reason="Quote must have meaningful length.",
+            evidence=[
+                {
+                    "source": "message",
+                    "quote": "a",
+                    "support": "Too short quote should be rejected.",
+                }
+            ],
+        )
+
+
 def test_evidence_rejects_whitespace_only_support():
     with pytest.raises(ValidationError):
         Recommendation(

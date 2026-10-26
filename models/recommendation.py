@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, StringConstraints, model_validator
 
 class Evidence(BaseModel):
     source: Literal["message", "tool_result"]
-    quote: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+    quote: Annotated[str, StringConstraints(strip_whitespace=True, min_length=8)]
     support: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 
 
