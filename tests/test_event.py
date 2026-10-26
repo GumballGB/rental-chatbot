@@ -141,3 +141,28 @@ def test_event_accepts_valid_run_finished_event():
     assert event.type == "run_finished"
     assert event.run_succeeded is True
     assert event.final_label == "genuine"
+
+
+def test_event_allows_failed_run_finished_without_label():
+    event = Event(
+        run_id=uuid4(),
+        enquiry_id="ENQ-001",
+        time=datetime.now(),
+        type="run_finished",
+        run_succeeded=False,
+    )
+
+    assert event.type == "run_finished"
+    assert event.run_succeeded is False
+    assert event.final_label is None
+
+
+def test_event_requires_final_label_for_successful_run_finished():
+    with pytest.raises(ValidationError, match="final_label is required"):
+        Event(
+            run_id=uuid4(),
+            enquiry_id="ENQ-001",
+            time=datetime.now(),
+            type="run_finished",
+            run_succeeded=True,
+        )

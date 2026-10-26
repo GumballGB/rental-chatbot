@@ -103,7 +103,7 @@ class Event(BaseModel):
             
             if self.run_succeeded is None:
                 raise ValueError("run_succeeded is required for run_finished events.")
-            if self.final_label is None:
+            if self.run_succeeded and self.final_label is None:
                 raise ValueError("final_label is required for run_finished events.")
 
         return self
