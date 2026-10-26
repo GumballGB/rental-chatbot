@@ -1,14 +1,15 @@
 import datetime
 import json
 import os
+import re
 import uuid
 
 from anthropic import Anthropic
 
+from core.store import NotFoundError
+from core.tools import SCHEMA_LIST, run_tool
 from models.enquiry import Enquiry
 from models.unit_enquiry import UnitEnquiry
-from core.store import NotFoundError
-from core.tools import run_tool, SCHEMA_LIST
 
 SYSTEM_PROMPT = """
 You extract information from rental unit enquiries.
@@ -41,9 +42,6 @@ Ask the user to get the necessary information about the rental enquiry, such as
 listing name, building name, and location. You only have 6 attempts to gather this information,
 so you may ask multiple questions to gather all the necessary details.
 The user may decline some information, and you should track which fields are declined.
-
-Additionally, this is all fictionial data, the listings and buildings do not correspond to real-world entities.
-The data may already hint at this, but assume that the user is already aware of this, so pretend it is "real".
 """
 
 # For formal reasons, I created a redundant function.
@@ -61,6 +59,24 @@ def verify_client(client):
         print("Client is not an instance of Anthropic.")
         return False
     return True
+
+
+def parse_unit_enquiry_json(text):
+    """
+    Parse extraction output as JSON, accepting plain JSON or a fenced JSON block.
+    """
+
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as initial_error:
+        match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
+        if not match:
+            raise ValueError(f"Model returned invalid JSON: {initial_error.msg}") from initial_error
+
+        try:
+            return json.loads(match.group(1))
+        except json.JSONDecodeError as fenced_error:
+            raise ValueError(f"Model returned invalid JSON: {fenced_error.msg}") from fenced_error
 
 
 def get_single_response_unit_enquiry(messages, client):
@@ -89,7 +105,7 @@ def get_single_response_unit_enquiry(messages, client):
 
     # At this stage our text is still a string, we need to convert it into a JSON
 
-    data = json.loads(text)
+    data = parse_unit_enquiry_json(text)
 
     # Now validate this JSON against the UnitEnquiry model to ensure it has the correct structure
     enquiry = UnitEnquiry.model_validate(data)
