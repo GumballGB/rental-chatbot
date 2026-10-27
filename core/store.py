@@ -1,4 +1,4 @@
-# Data access layer for the application. This module provides functions 
+# Data access layer for the application. This module provides functions
 # to interact with the data. This is supposed to be read-only.
 # By design, the store will fetch all the data at once, ready to go, from memory.
 
@@ -21,9 +21,11 @@ def normalize_name(value: str) -> str:
         if not unicodedata.combining(character)
     )
     return " ".join(
-        "".join(character if character.isalnum() else " " for character in value)
-        .split()
+        "".join(
+            character if character.isalnum() else " " for character in value
+        ).split()
     )
+
 
 class NotFoundError(Exception):
     """Raised when a lookup is given an id that does not exist in the store."""
@@ -34,11 +36,11 @@ class JsonStore:
     A class to handle reading JSON data for the application.
     """
 
-    def __init__(self, data_dir = DATA_DIR):
+    def __init__(self, data_dir=DATA_DIR):
         """
         Initialize the JsonStore with the directory where JSON files are stored.
         Convert all JSON files to Pydantic models and validate them.
-        The reason that everything gets converted to Pydantic models is that we want 
+        The reason that everything gets converted to Pydantic models is that we want
         to ensure that the data is valid and has the correct structure.
         Also, the dataset is small, so we can afford to load everything into memory at once.
         """
@@ -53,24 +55,22 @@ class JsonStore:
         self.locations: dict[str, Location] = {}
 
         for n in ["buildings.json", "listings.json", "locations.json"]:
-            
             data = self.load_data(n)
-                
+
             if n == "buildings.json":
                 for d in data:
                     building = Building.model_validate(d)
                     self.buildings[building.building_id] = building
-                
+
             elif n == "listings.json":
                 for d in data:
                     listing = Listing.model_validate(d)
                     self.listings[listing.listing_id] = listing
-                
+
             elif n == "locations.json":
                 for d in data:
                     loc = Location.model_validate(d)
                     self.locations[loc.location_id] = loc
-
 
     # Helper function to load data from a JSON file
     def load_data(self, filename: str) -> list[dict[str, Any]]:
@@ -81,7 +81,7 @@ class JsonStore:
         :return: List of dictionaries containing the data.
         """
         file_path = os.path.join(self.data_dir, filename)
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             return json.load(f)
 
     # Main Getters
@@ -140,7 +140,6 @@ class JsonStore:
             raise NotFoundError(f"Building with id {building_id} not found.")
 
         for listing in self.listings.values():
-
             if listing.building_id == building_id:
                 listings_per_building[listing.listing_id] = listing
 
@@ -161,13 +160,10 @@ class JsonStore:
             raise NotFoundError(f"Location with id {location_id} not found.")
 
         for building in self.buildings.values():
-
             if building.location_id == location_id:
                 buildings_per_location[building.building_id] = building
 
         return buildings_per_location
-
-
 
     # Finder for a location, not that locations can have alternative names
     # Note that accents are a thing, for Montreal and Copenhagen names (like Montréal and København)
@@ -205,11 +201,12 @@ class JsonStore:
                 return location
 
         for location, location_names in normalized_locations:
-            if any(normalized_name in location_name for location_name in location_names):
+            if any(
+                normalized_name in location_name for location_name in location_names
+            ):
                 return location
 
         raise NotFoundError(f"Location with name {name} not found.")
-
 
     # The ultimate search function for listings with various filters
     def search_listings(
@@ -306,4 +303,3 @@ class JsonStore:
             matches.sort(key=lambda listing: listing.monthly_rent, reverse=True)
 
         return matches[:limit]
-

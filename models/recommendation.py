@@ -1,7 +1,6 @@
 # For the agent triage part
 
-from typing import Literal
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, StringConstraints, model_validator
 

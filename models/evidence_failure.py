@@ -1,5 +1,7 @@
-from models.recommendation import Evidence
 from pydantic import BaseModel
+
+from models.recommendation import Evidence
+
 
 # For when an evidence is actually bad, the checker deemed it to be a failure, and we want to report it.
 # This does not actually means the recommendation is bad, just that the evidence is not found in the source text.

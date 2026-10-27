@@ -19,7 +19,6 @@ def get_listing(store: JsonStore, listing_id: str) -> str:
     """
 
     try:
-
         # Get the pydantic listing obj. from the JSON store
         listing = store.get_listing(listing_id)
 
@@ -29,13 +28,12 @@ def get_listing(store: JsonStore, listing_id: str) -> str:
         return listing_json
 
     except NotFoundError as e:
-
         # JSON-ify the error message
         error_json = {"error": str(e)}
 
         return json.dumps(error_json)
 
-    
+
 GET_LISTING_SCHEMA = {
     "name": "get_listing",
     "description": "Get a listing from its ID. The listing ID is always LST- with a unique identifier. For example, LST-123. "
@@ -43,10 +41,14 @@ GET_LISTING_SCHEMA = {
     "input_schema": {
         "type": "object",
         "properties": {
-            "listing_id": {"type": "string", "description": "The ID of the listing to retrieve."}
+            "listing_id": {
+                "type": "string",
+                "description": "The ID of the listing to retrieve.",
+            }
         },
-    }
+    },
 }
+
 
 def get_building(store: JsonStore, building_id: str) -> str:
     """
@@ -76,9 +78,12 @@ GET_BUILDING_SCHEMA = {
     "input_schema": {
         "type": "object",
         "properties": {
-            "building_id": {"type": "string", "description": "The ID of the building to retrieve."}
+            "building_id": {
+                "type": "string",
+                "description": "The ID of the building to retrieve.",
+            }
         },
-    }
+    },
 }
 
 
@@ -115,26 +120,28 @@ def search_listings(store: JsonStore, **filters) -> str:
     for listing in listings:
         building = store.get_building(listing.building_id)
         location = store.get_location(building.location_id)
-        results.append({
-            "listing_id": listing.listing_id,
-            "listing_name": listing.listing_name,
-            "monthly_rent": listing.monthly_rent,
-            "currency": listing.currency,
-            "bedrooms": listing.bedrooms,
-            "bathrooms": listing.bathrooms,
-            "layout": listing.layout,
-            "availability_status": listing.availability_status,
-            "available_date": (
-                listing.available_date.isoformat()
-                if listing.available_date is not None
-                else None
-            ),
-            "pets_allowed": listing.pets_allowed,
-            "building_id": building.building_id,
-            "building_name": building.name,
-            "location_id": location.location_id,
-            "location_name": location.name,
-        })
+        results.append(
+            {
+                "listing_id": listing.listing_id,
+                "listing_name": listing.listing_name,
+                "monthly_rent": listing.monthly_rent,
+                "currency": listing.currency,
+                "bedrooms": listing.bedrooms,
+                "bathrooms": listing.bathrooms,
+                "layout": listing.layout,
+                "availability_status": listing.availability_status,
+                "available_date": (
+                    listing.available_date.isoformat()
+                    if listing.available_date is not None
+                    else None
+                ),
+                "pets_allowed": listing.pets_allowed,
+                "building_id": building.building_id,
+                "building_name": building.name,
+                "location_id": location.location_id,
+                "location_name": location.name,
+            }
+        )
 
     return json.dumps({"count": len(results), "listings": results})
 
@@ -145,8 +152,14 @@ SEARCH_LISTINGS_SCHEMA = {
     "input_schema": {
         "type": "object",
         "properties": {
-            "location_name": {"type": "string", "description": "Neighbourhood or location name."},
-            "building_name": {"type": "string", "description": "Full or partial building name."},
+            "location_name": {
+                "type": "string",
+                "description": "Neighbourhood or location name.",
+            },
+            "building_name": {
+                "type": "string",
+                "description": "Full or partial building name.",
+            },
             "min_rent": {"type": "integer", "minimum": 0},
             "max_rent": {"type": "integer", "minimum": 0},
             "currency": {
@@ -202,16 +215,14 @@ def run_tool(tool_name: str, store: JsonStore, **kwargs) -> str:
 
     if tool_name not in LOOKUP_DICT:
         return json.dumps({"error": f"Tool {tool_name} not found."})
-    
+
     tool_func = LOOKUP_DICT[tool_name]
 
     # Every tool function have their own required arguments, which are passed via **kwargs
 
-    try: 
-
+    try:
         result = tool_func(store, **kwargs)
 
         return result
     except TypeError as e:
-
         return json.dumps({"error": str(e)})

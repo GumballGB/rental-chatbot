@@ -3,6 +3,8 @@
 # These tests do not use the real Anthropic client, but instead use a 
 # FakeAnthropicClient that can be scripted with responses.
 
+import json
+
 import pytest
 
 from agents import anthropic_functions as af
@@ -15,7 +17,7 @@ def test_run_tool_loop_plain_answer_no_tool_use():
     store = JsonStore()
     messages = [{"role": "user", "content": "Is this available?"}]
 
-    text, updated_messages = af.run_tool_loop(messages, client, store)
+    text, updated_messages = af.run_tool_loop(messages, client, store, "test system")
 
     assert text == "Here is the answer."
     assert updated_messages[-1]["role"] == "assistant"
@@ -31,7 +33,7 @@ def test_run_tool_loop_tool_use_then_end_turn():
     store = JsonStore()
     messages = [{"role": "user", "content": "Check listing LST-001"}]
 
-    text, updated_messages = af.run_tool_loop(messages, client, store)
+    text, updated_messages = af.run_tool_loop(messages, client, store, "test system")
     tool_result_block = updated_messages[-2]["content"][0]
 
     assert text == "I checked the listing and it is available."
@@ -51,7 +53,7 @@ def test_run_tool_loop_stops_after_six_iterations():
     store = JsonStore()
     messages = [{"role": "user", "content": "keep checking"}]
 
-    text, updated_messages = af.run_tool_loop(messages, client, store)
+    text, updated_messages = af.run_tool_loop(messages, client, store, "test system")
 
     assert "trouble completing that lookup" in text
     assert updated_messages[-1]["role"] == "assistant"
@@ -65,4 +67,65 @@ def test_run_tool_loop_raises_on_unexpected_stop_reason():
     messages = [{"role": "user", "content": "hello"}]
 
     with pytest.raises(RuntimeError, match="Unexpected tool response: max_tokens"):
-        af.run_tool_loop(messages, client, store)
+        af.run_tool_loop(messages, client, store, "test system")
+
+
+def test_extract_unit_enquiry_accepts_fake_client():
+    extracted_data = {
+        "name": "Sam",
+        "email": "sam@example.com",
+        "phone": None,
+        "move_in_date": None,
+        "budget": 1900,
+        "message": "Looking for a rental.",
+        "listing_id": "LST-002",
+        "declined_fields": ["phone"],
+    }
+    client = FakeAnthropicClient([text_response(json.dumps(extracted_data))])
+
+    enquiry, declined_fields = af.extract_enquiry_unit_enquiry(
+        [{"role": "user", "content": "Extract this enquiry."}],
+        client,
+    )
+
+    assert enquiry.name == "Sam"
+    assert enquiry.listing_id == "LST-002"
+    assert declined_fields == {"phone"}
+
+
+def test_run_tool_loop_reports_model_and_tool_events_in_order():
+    responses = [
+        tool_use_response(
+            "get_listing",
+            {"listing_id": "LST-001"},
+            tool_use_id="toolu_1",
+        ),
+        text_response(
+            "The listing is available.",
+            input_tokens=25,
+            output_tokens=8,
+        ),
+    ]
+    client = FakeAnthropicClient(responses)
+    reported_events = []
+
+    def collect_event(event_type, **details):
+        reported_events.append((event_type, details))
+
+    af.run_tool_loop(
+        [{"role": "user", "content": "Check LST-001"}],
+        client,
+        JsonStore(),
+        "triage system",
+        on_event=collect_event,
+    )
+
+    assert [event_type for event_type, _ in reported_events] == [
+        "model_call",
+        "tool_call",
+        "tool_result",
+        "model_call",
+    ]
+    assert reported_events[2][1]["tool_succeeded"] is True
+    assert reported_events[3][1]["tokens_in"] == 25
+    assert client.messages.calls[0]["system"] == "triage system"

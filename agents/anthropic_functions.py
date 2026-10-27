@@ -44,6 +44,8 @@ so you may ask multiple questions to gather all the necessary details.
 The user may decline some information, and you should track which fields are declined.
 """
 
+MODEL = "claude-haiku-5-5"
+
 # For formal reasons, I created a redundant function.
 def boot_anthropic():
 
@@ -53,15 +55,7 @@ def boot_anthropic():
     return client
 
 
-def verify_client(client):
-
-    if not isinstance(client, Anthropic):
-        print("Client is not an instance of Anthropic.")
-        return False
-    return True
-
-
-def parse_unit_enquiry_json(text):
+def parse_model_json(text):
     """
     Parse extraction output as JSON, accepting plain JSON or a fenced JSON block.
     """
@@ -77,45 +71,6 @@ def parse_unit_enquiry_json(text):
             return json.loads(match.group(1))
         except json.JSONDecodeError as fenced_error:
             raise ValueError(f"Model returned invalid JSON: {fenced_error.msg}") from fenced_error
-
-
-def get_single_response_unit_enquiry(messages, client):
-
-    if not verify_client(client):
-        raise TypeError("Anthropic AI not configured.")
-
-    response = client.messages.create(
-        max_tokens=1024,
-        system=SYSTEM_PROMPT,
-        messages=messages,
-        model="claude-haiku-5-5",
-    )
-
-    # We need to convert the list of blocks into a single string, so we can parse it as JSON later
-    # We expect a completed response before parsing JSON
-    if response.stop_reason != "end_turn":
-        raise RuntimeError(
-            f"Extraction did not finish: {response.stop_reason}"
-        )
-
-    text = ""
-    for block in response.content:
-        if block.type == "text":
-            text += block.text
-
-    # At this stage our text is still a string, we need to convert it into a JSON
-
-    data = parse_unit_enquiry_json(text)
-
-    # Now validate this JSON against the UnitEnquiry model to ensure it has the correct structure
-    enquiry = UnitEnquiry.model_validate(data)
-
-    # It is possible that the user declines to provide certain information. We need to check for that and track it
-    # The system prompt accounts for this and has its dedicated field for it, so we can just extract it from the JSON
-    declined = set(data.get("declined_fields") or [])
-
-    # return it as a tuple
-    return enquiry, declined
 
 
 # Helper function to create an Enquiry object from the extracted data and the data store
@@ -148,9 +103,66 @@ def create_enquiry(data, data_store):
     return Enquiry(**enquiry_data)
 
 
+def extract_enquiry_unit_enquiry(messages, client):
+    """
+    Extract a unit enquiry from the conversation messages using the Anthropic client.
+    The function will be given the full message chain of the conversation up to this point.
+    It is also given the Anthropic client to interact with the model for extraction.
+
+    During the conversation, fields may be declined. The function will track which fields have been
+    declined and return them along with the extracted enquiry. These declined fields are used
+    for the agent triage.
+
+    Args:
+        messages (list): The conversation messages to send to the model.
+        client: The Anthropic client used for interacting with the model.
+
+    Returns:
+        tuple: A tuple containing the extracted UnitEnquiry object and a set of declined fields.
+    """
+
+    # Send the messages to the model to get a response for the unit enquiry.
+    response = client.messages.create(
+        max_tokens=1024,
+        system=SYSTEM_PROMPT,
+        messages=messages,
+        model=MODEL,
+    )
+
+    # We need to convert the list of blocks into a single string, so we can parse it as JSON later
+    # We expect a completed response before parsing JSON
+    if response.stop_reason != "end_turn":
+        raise RuntimeError(
+            f"Extraction did not finish: {response.stop_reason}"
+        )
+
+    text = ""
+    for block in response.content:
+        if block.type == "text":
+            text += block.text
+
+    # At this stage our text is still a string, we need to convert it into a JSON
+
+    data = parse_model_json(text)
+
+    # Now validate this JSON against the UnitEnquiry model to ensure it has the correct structure
+    enquiry = UnitEnquiry.model_validate(data)
+
+    # It is possible that the user declines to provide certain information. We need to check for that and track it
+    # The system prompt accounts for this and has its dedicated field for it, so we can just extract it from the JSON
+    declined = set(data.get("declined_fields") or [])
+
+    # return it as a tuple
+    return enquiry, declined
+
+
+# The function to run the CHAT BOT for rental enquiries, generates an Enquiry object.
 def run_rental_chat(client, data_store):
     """
     Run the rental chat with the user, gather information, and create an Enquiry object.
+    There are two major phases in this function: the natural language loop phase,
+    where the user interacts with the assistant, and the extraction phase,
+    where the gathered information is converted into an Enquiry object.
 
     Args:
         client: The Anthropic client used for interacting with the model.
@@ -160,35 +172,54 @@ def run_rental_chat(client, data_store):
         tuple: A tuple containing the created Enquiry object and a set of declined fields.
     """
 
+    # Create initial fields for the conversation messages
     tool_messages = []
-    plain_messages = []
+    plain_messages = [] # Will store the conversation messages for the plain loop (user-assistant)
 
     print("Assistant: Hello! Ask me about a rental. Type 'done' when finished.")
 
+    # -*-*- NATURAL LANGUAGE LOOP PHASE -*-*- #
+
     while True:
+
         user_message = input("You: ").strip()
 
+        # If the user types 'done', we exit the loop
         if user_message.lower() == "done":
             break
 
+        # Skip empty user messages
         if not user_message:
             continue
 
+        # Record the user's turn in both the tool and plain message lists
         user_turn = {"role": "user", "content": user_message}
         tool_messages.append(user_turn)
         plain_messages.append(user_turn.copy())
 
+        # Prepare the tool loop with the current conversation messages
+        # Note that tool_messages is mutated but returned as well, so we capture the updated list.
         assistant_message, tool_messages = run_tool_loop(
             tool_messages,
             client,
             data_store,
+            system=TOOL_SYSTEM_PROMPT, # The prompt is what makes this a rental chatbot experience.
         )
+
+        # Capture and display the assistant's last response for the user.
         print(f"Assistant: {assistant_message}")
         plain_messages.append({"role": "assistant", "content": assistant_message})
 
+    # At this point, the conversation has ended.
+
+    # Another claude call will be made, but if the conversation is empty, we just raise an error.
     if not plain_messages:
         raise RuntimeError("Cannot create an enquiry from an empty conversation.")
 
+    # -*-*- EXTRACTION PHASE -*-*- #
+    # CONVERSION TO ENQUIRY OBJECT
+
+    # Build the extraction messages for the final Claude call to extract the rental enquiry.
     extraction_messages = [
         *plain_messages,
         {
@@ -196,40 +227,54 @@ def run_rental_chat(client, data_store):
             "content": "Extract the rental enquiry from this conversation.",
         },
     ]
-    unit_enquiry, declined_fields = get_single_response_unit_enquiry(
+
+    # Call the function to get the unit enquiry and any declined fields from the extraction messages.
+    unit_enquiry, declined_fields = extract_enquiry_unit_enquiry(
         extraction_messages,
         client,
     )
+
+    # Finally, create the enquiry object from the extracted unit enquiry.
     enquiry = create_enquiry(unit_enquiry.model_dump(), data_store)
 
     return enquiry, declined_fields
 
 
-# Functions to now use the tools for Claude
-def run_tool_loop(messages, client, data_store):
+# Function used both in the rental chatbot and the agent triage system to run tools in a loop
+def run_tool_loop(messages, client, data_store, system, on_event=None):
     """
     Run the tool loop with the user, allowing the assistant to use tools to gather information.
+    This function is used in both the rental chatbot and the agent triage. Send messages to Claude,
+    execute any tools Claude requests, and repeat until Claude returns a normal text answer.
 
     Args:
         messages (list): The conversation messages between the user and the assistant.
         client: The Anthropic client used for interacting with the model.
-        data_store (JsonStore): The data store containing listing information.
+        data_store (JsonStore): The data store containing listing information. (rental data).
+        system (str): The system (instructions) prompt to guide the assistant's behavior.
+        on_event (callable, optional): A callback function to capture events such as model calls and token usage.
 
     Returns:
-        tuple: A tuple containing the assistant's response text and the updated messages list.
+        tuple: A tuple containing the assistant's response text (final answer) and the updated messages list.
+        The updated message list is the conversation history including tool calls and result outputs.
     """
 
+    # Define a counter to track the number of iterations in the tool loop
     while_iter = 0
 
+    # Start the tool loop, remember that there is a maximum of 6 iterations to avoid excessive costs
     while True:
 
-        # To avoid costs, the chatbot will only run for 6 times
+        # To avoid costs, the loop only runs 6 times
         if while_iter >= 6:
+            # If the loop has run 6 times, inform the user and exit to avoid excessive costs
             text = (
                 "I'm having trouble completing that lookup right now. "
                 "You can try another question or type 'done' to finish."
             )
             messages.append({"role": "assistant", "content": text})
+
+            # Capture the response and return it along with the updated messages list
             return text, messages
 
 
@@ -238,18 +283,32 @@ def run_tool_loop(messages, client, data_store):
 
         # Prompt claude to enter the tool they want to use
         response = client.messages.create(
-            model="claude-haiku-5-5",
+            model=MODEL,
             max_tokens=1024,
-            system=TOOL_SYSTEM_PROMPT,
+            system=system,
             tools=SCHEMA_LIST,
             messages=messages,
         )
 
+        # It is needed to capture/update the model and tokens used in this call
+        # Capture and report the model call event if a callback is provided (EVENT)
+        if on_event is not None:
+            on_event(
+                "model_call",
+                model=MODEL,
+                tokens_in=response.usage.input_tokens,
+                tokens_out=response.usage.output_tokens,
+            )
 
-        # At this stage the tool reason is dropped
 
+        # At this stage the tool/response reason is given, which means;
+        # The Agent has indicated it wants to use a tool to gather information.
+        # OR The agent triage system has indicated it wants to use a tool to gather information.
+
+        # This responses indicated the agent is finished and has provided a final answer.
         if response.stop_reason == "end_turn":
 
+            # Final answer has been provided by the agent, append it to the messages and return it.
             messages.append({
                 "role": "assistant",
                 "content": response.content
@@ -260,13 +319,48 @@ def run_tool_loop(messages, client, data_store):
             )
             return text, messages
 
+        # This reponse indicates that the agent requires the use of a tool to gather information.
         elif response.stop_reason == "tool_use":
+
+            # Capture the agent's indication to use a tool by appending it to the messages.
             messages.append({"role": "assistant", "content": response.content})
 
+            # Initialize a list to store the results of tool usage
             results = []
+
+            # Iterate through each block in the response content to identify tool usage requests
             for block in response.content:
+
+                # Process each block in the response content to handle tool usage
                 if block.type == "tool_use":
+
+                    # Notify that a tool is being called, creating an EVENT
+                    if on_event is not None:
+                        on_event("tool_call", tool=block.name, args=block.input)
+
+                    # Run the tool with the provided input and capture the output
                     output = run_tool(block.name, data_store, **block.input)
+
+                    # Attempt to parse the tool output as JSON to determine success
+                    try:
+                        output_data = json.loads(output)
+                        tool_succeeded = not (
+                            isinstance(output_data, dict) and "error" in output_data
+                        )
+                    except json.JSONDecodeError:
+                        tool_succeeded = False
+
+                    # Notify that a tool has returned a result. (EVENT)
+                    if on_event is not None:
+                        on_event(
+                            "tool_result",
+                            tool=block.name,
+                            tool_succeeded=tool_succeeded,
+                            tool_result=output,
+                        )
+
+                    # Append the tool result to the results list for later inclusion in the messages.
+                    # This will be used for the agent triage
                     results.append({"type": "tool_result", "tool_use_id": block.id, "content": output})
 
             messages.append({"role": "user", "content": results})
@@ -286,9 +380,6 @@ def get_usage(client):
     Returns:
         dict: The usage information retrieved from the client.
     """
-
-    if not verify_client(client):
-        raise TypeError("Anthropic AI not configured.")
 
     usage = client.usage.retrieve()
     return usage
