@@ -7,7 +7,7 @@ import uuid
 from anthropic import Anthropic
 
 from core.store import NotFoundError
-from core.tools import SCHEMA_LIST, run_tool
+from core.tools import CHATBOT_SCHEMA_LIST, run_tool
 from models.enquiry import Enquiry
 from models.unit_enquiry import UnitEnquiry
 
@@ -241,7 +241,15 @@ def run_rental_chat(client, data_store):
 
 
 # Function used both in the rental chatbot and the agent triage system to run tools in a loop
-def run_tool_loop(messages, client, data_store, system, on_event=None):
+def run_tool_loop(
+    messages,
+    client,
+    data_store,
+    system,
+    on_event=None,
+    tool_schemas=CHATBOT_SCHEMA_LIST,
+    bound_tool_arguments=None,
+):
     """
     Run the tool loop with the user, allowing the assistant to use tools to gather information.
     This function is used in both the rental chatbot and the agent triage. Send messages to Claude,
@@ -261,6 +269,8 @@ def run_tool_loop(messages, client, data_store, system, on_event=None):
 
     # Define a counter to track the number of iterations in the tool loop
     while_iter = 0
+    allowed_tool_names = {schema["name"] for schema in tool_schemas}
+    bound_tool_arguments = bound_tool_arguments or {}
 
     # Start the tool loop, remember that there is a maximum of 6 iterations to avoid excessive costs
     while True:
@@ -286,7 +296,7 @@ def run_tool_loop(messages, client, data_store, system, on_event=None):
             model=MODEL,
             max_tokens=1024,
             system=system,
-            tools=SCHEMA_LIST,
+            tools=tool_schemas,
             messages=messages,
         )
 
@@ -333,13 +343,22 @@ def run_tool_loop(messages, client, data_store, system, on_event=None):
 
                 # Process each block in the response content to handle tool usage
                 if block.type == "tool_use":
+                    tool_arguments = {
+                        **block.input,
+                        **bound_tool_arguments.get(block.name, {}),
+                    }
 
                     # Notify that a tool is being called, creating an EVENT
                     if on_event is not None:
-                        on_event("tool_call", tool=block.name, args=block.input)
+                        on_event("tool_call", tool=block.name, args=tool_arguments)
 
                     # Run the tool with the provided input and capture the output
-                    output = run_tool(block.name, data_store, **block.input)
+                    output = run_tool(
+                        block.name,
+                        data_store,
+                        allowed_tool_names,
+                        **tool_arguments,
+                    )
 
                     # Attempt to parse the tool output as JSON to determine success
                     try:

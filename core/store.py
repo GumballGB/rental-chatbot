@@ -5,9 +5,11 @@
 import json
 import os
 import unicodedata
+from datetime import date
 from typing import Any
 
 from models.building import Building
+from models.enquiry import Enquiry
 from models.listings import Listing
 from models.location import Location
 
@@ -25,6 +27,13 @@ def normalize_name(value: str) -> str:
             character if character.isalnum() else " " for character in value
         ).split()
     )
+
+
+def normalize_phone(value: str) -> str:
+    digits = "".join(character for character in value if character.isdigit())
+    if len(digits) == 11 and digits.startswith("1"):
+        return digits[1:]
+    return digits
 
 
 class NotFoundError(Exception):
@@ -53,8 +62,14 @@ class JsonStore:
         self.buildings: dict[str, Building] = {}
         self.listings: dict[str, Listing] = {}
         self.locations: dict[str, Location] = {}
+        self.enquiries: dict[str, Enquiry] = {}
 
-        for n in ["buildings.json", "listings.json", "locations.json"]:
+        for n in [
+            "buildings.json",
+            "listings.json",
+            "locations.json",
+            "unit_enquiries.json",
+        ]:
             data = self.load_data(n)
 
             if n == "buildings.json":
@@ -71,6 +86,10 @@ class JsonStore:
                 for d in data:
                     loc = Location.model_validate(d)
                     self.locations[loc.location_id] = loc
+            elif n == "unit_enquiries.json":
+                for d in data:
+                    enquiry = Enquiry.model_validate(d)
+                    self.enquiries[enquiry.enquiry_id] = enquiry
 
     # Helper function to load data from a JSON file
     def load_data(self, filename: str) -> list[dict[str, Any]]:
@@ -124,6 +143,11 @@ class JsonStore:
             return self.locations[location_id]
         else:
             raise NotFoundError(f"Location with id {location_id} not found.")
+
+    def get_enquiry(self, enquiry_id: str) -> Enquiry:
+        if enquiry_id in self.enquiries:
+            return self.enquiries[enquiry_id]
+        raise NotFoundError(f"Enquiry with id {enquiry_id} not found.")
 
     # Return the list of listing as objects
     def get_listing_object_per_building(self, building_id) -> dict[str, Listing]:
@@ -303,3 +327,103 @@ class JsonStore:
             matches.sort(key=lambda listing: listing.monthly_rent, reverse=True)
 
         return matches[:limit]
+
+    # Find potential duplicate enquiries based on various criteria
+    def find_duplicate_enquiry_candidates(
+        self,
+        exclude_enquiry_id: str,
+        received_before: str,
+        email: str | None = None,
+        phone: str | None = None,
+        name: str | None = None,
+        listing_id: str | None = None,
+        move_in_date: str | None = None,
+    ) -> list[tuple[Enquiry, list[str]]]:
+        """
+        Find potential duplicate enquiries based on email, phone, name, listing ID, and move-in date.
+        This function uses a strong matching strategy, prioritizing exact matches on email and phone,
+        while also considering supporting matches on name, listing ID, and move-in date.
+
+        Args:
+            exclude_enquiry_id (str): The enquiry ID to exclude from the search.
+            email (str | None): The email to match.
+            phone (str | None): The phone number to match.
+            name (str | None): The name to match.
+            listing_id (str | None): The listing ID to match.
+            move_in_date (str | None): The move-in date to match.
+
+        Returns:
+            list[tuple[Enquiry, list[str]]]: A list of tuples containing the matching enquiry and the fields it matched on.
+
+        """
+
+        # Ensure at least one search field is provided for duplicate detection
+        if not any([email, phone, name, listing_id, move_in_date]):
+            raise ValueError("At least one duplicate search field is required.")
+
+        # Normalize the input fields for comparison
+        # Strip and casefold the email, normalize the phone, and normalize the name
+        # for consistent comparison, it removes accents
+        current_received_date = date.fromisoformat(received_before)
+        normalized_email = email.strip().casefold() if email else None
+        normalized_phone = normalize_phone(phone) if phone else None
+        normalized_person_name = normalize_name(name) if name else None
+
+        # Initalize a list of candidates
+        candidates = []
+
+        # Iterate through all enquiries to find potential duplicates
+        for enquiry in self.enquiries.values():
+
+            # Skip the enquiry if it matches the excluded enquiry ID
+            if enquiry.enquiry_id == exclude_enquiry_id:
+                continue
+            if enquiry.received_date is None:
+                continue
+            if date.fromisoformat(enquiry.received_date) >= current_received_date:
+                continue
+
+            # Initialize a list to keep track of which fields matched for the current candidate
+            matched_on = []
+            if (
+                normalized_email
+                and enquiry.email
+                and enquiry.email.strip().casefold() == normalized_email
+            ):
+                matched_on.append("email")
+
+            # Normalize the candidate's phone number for comparison
+            candidate_phone = normalize_phone(enquiry.phone) if enquiry.phone else None
+            if normalized_phone and candidate_phone == normalized_phone:
+                matched_on.append("phone")
+
+            # Normalize the candidate's name for comparison
+            if (
+                normalized_person_name
+                and enquiry.name
+                and normalize_name(enquiry.name) == normalized_person_name
+            ):
+                matched_on.append("name")
+
+            # Check if the listing ID and move-in date match the current candidate
+            if listing_id and enquiry.listing_id == listing_id:
+                matched_on.append("listing_id")
+            if move_in_date and enquiry.move_in_date == move_in_date:
+                matched_on.append("move_in_date")
+
+            # Determine if the current candidate has a strong match (email or phone)
+            # or enough supporting matches (name, listing_id, move_in_date) to be
+            # considered a potential duplicate
+            has_strong_match = "email" in matched_on or "phone" in matched_on
+            supporting_matches = {
+                "name",
+                "listing_id",
+                "move_in_date",
+            }.intersection(matched_on)
+
+            # Determine if the current candidate should be
+            # added to the list of potential duplicates
+            if has_strong_match or len(supporting_matches) >= 2:
+                candidates.append((enquiry, matched_on))
+
+        return candidates

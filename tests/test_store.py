@@ -114,6 +114,56 @@ def test_get_faulty_location():
         "Location with id LOC-999 not found."
     )
 
+
+def test_get_enquiry_by_id():
+    enquiry = JsonStore().get_enquiry("ENQ-001")
+
+    assert enquiry.name == "Alex Morgan"
+    assert enquiry.email == "alex.morgan@example.com"
+
+
+def test_find_duplicate_candidates_excludes_current_enquiry():
+    candidates = JsonStore().find_duplicate_enquiry_candidates(
+        exclude_enquiry_id="ENQ-011",
+        received_before="2026-10-24",
+        email="alex.morgan@example.com",
+        phone="+1-514-555-0101",
+    )
+
+    assert [enquiry.enquiry_id for enquiry, _ in candidates] == ["ENQ-001"]
+    assert candidates[0][1] == ["email", "phone"]
+
+
+def test_find_duplicate_candidates_uses_phone_without_email():
+    candidates = JsonStore().find_duplicate_enquiry_candidates(
+        exclude_enquiry_id="ENQ-011",
+        received_before="2026-10-24",
+        phone="5145550101",
+    )
+
+    assert [enquiry.enquiry_id for enquiry, _ in candidates] == ["ENQ-001"]
+
+
+def test_original_enquiry_does_not_match_later_follow_up():
+    candidates = JsonStore().find_duplicate_enquiry_candidates(
+        exclude_enquiry_id="ENQ-001",
+        received_before="2026-10-20",
+        email="alex.morgan@example.com",
+        phone="+1-514-555-0101",
+    )
+
+    assert candidates == []
+
+
+def test_duplicate_candidates_exclude_same_day_enquiries():
+    candidates = JsonStore().find_duplicate_enquiry_candidates(
+        exclude_enquiry_id="ENQ-CURRENT",
+        received_before="2026-10-20",
+        email="alex.morgan@example.com",
+    )
+
+    assert candidates == []
+
 # Test getting all listings as objects from a building
 def test_get_listings_from_building():
 

@@ -4,7 +4,11 @@ import json
 
 from core.store import JsonStore, normalize_name
 from core.tools import (
+    CHATBOT_SCHEMA_LIST,
+    TRIAGE_SCHEMA_LIST,
+    find_duplicate_enquiry_candidates,
     get_building,
+    get_enquiry,
     get_listing,
     get_location_by_name,
     run_tool,
@@ -72,7 +76,12 @@ def test_run_tool_get_listing_happy_path():
     store = JsonStore()
     listing_id = "LST-001"
 
-    result = run_tool("get_listing", store, listing_id=listing_id)
+    result = run_tool(
+        "get_listing",
+        store,
+        {"get_listing"},
+        listing_id=listing_id,
+    )
     result_json = json.loads(result)
 
     assert result_json["listing_id"] == "LST-001"
@@ -86,7 +95,12 @@ def test_run_tool_get_listing_not_found():
     store = JsonStore()
     listing_id = "LST-999"
 
-    result = run_tool("get_listing", store, listing_id=listing_id)
+    result = run_tool(
+        "get_listing",
+        store,
+        {"get_listing"},
+        listing_id=listing_id,
+    )
     result_json = json.loads(result)
 
     assert "error" in result_json
@@ -97,7 +111,7 @@ def test_run_tool_get_listing_missing_argument():
 
     store = JsonStore()
 
-    result = run_tool("get_listing", store)
+    result = run_tool("get_listing", store, {"get_listing"})
     result_json = json.loads(result)
 
     assert "error" in result_json
@@ -107,7 +121,7 @@ def test_run_tool_unknown_tool():
 
     store = JsonStore()
 
-    result = run_tool("unknown_tool", store)
+    result = run_tool("unknown_tool", store, {"unknown_tool"})
     result_json = json.loads(result)
 
     assert "error" in result_json
@@ -200,3 +214,47 @@ def test_search_listings_sorts_all_matches_before_limit():
         listing["monthly_rent"]
         for listing in result_json["listings"]
     ] == expected_rents
+
+
+def test_get_enquiry_tool_returns_serialized_enquiry():
+    result = json.loads(get_enquiry(JsonStore(), "ENQ-001"))
+
+    assert result["enquiry_id"] == "ENQ-001"
+    assert result["email"] == "alex.morgan@example.com"
+
+
+def test_find_duplicate_candidates_tool_excludes_current_enquiry():
+    result = json.loads(
+        find_duplicate_enquiry_candidates(
+            JsonStore(),
+            exclude_enquiry_id="ENQ-011",
+            received_before="2026-10-24",
+            email="alex.morgan@example.com",
+        )
+    )
+
+    assert result["count"] == 1
+    assert result["candidates"][0]["enquiry_id"] == "ENQ-001"
+    assert result["candidates"][0]["matched_on"] == ["email"]
+
+
+def test_enquiry_history_tools_are_only_exposed_to_triage():
+    chatbot_tool_names = {schema["name"] for schema in CHATBOT_SCHEMA_LIST}
+    triage_tool_names = {schema["name"] for schema in TRIAGE_SCHEMA_LIST}
+
+    assert "get_enquiry" not in chatbot_tool_names
+    assert "find_duplicate_enquiry_candidates" not in chatbot_tool_names
+    assert "get_enquiry" in triage_tool_names
+    assert "find_duplicate_enquiry_candidates" in triage_tool_names
+
+
+def test_dispatcher_denies_enquiry_tool_for_chatbot():
+    allowed_tool_names = {schema["name"] for schema in CHATBOT_SCHEMA_LIST}
+    result = run_tool(
+        "get_enquiry",
+        JsonStore(),
+        allowed_tool_names,
+        enquiry_id="ENQ-001",
+    )
+
+    assert json.loads(result) == {"error": "Tool get_enquiry is not allowed."}

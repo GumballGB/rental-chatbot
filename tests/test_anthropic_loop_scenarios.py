@@ -9,6 +9,7 @@ import pytest
 
 from agents import anthropic_functions as af
 from core.store import JsonStore
+from core.tools import TRIAGE_SCHEMA_LIST
 from tests.fakes import FakeAnthropicClient, text_response, tool_use_response
 
 
@@ -21,7 +22,7 @@ def test_run_tool_loop_plain_answer_no_tool_use():
 
     assert text == "Here is the answer."
     assert updated_messages[-1]["role"] == "assistant"
-    assert client.messages.calls[0]["tools"] == af.SCHEMA_LIST
+    assert client.messages.calls[0]["tools"] == af.CHATBOT_SCHEMA_LIST
 
 
 def test_run_tool_loop_tool_use_then_end_turn():
@@ -129,3 +130,36 @@ def test_run_tool_loop_reports_model_and_tool_events_in_order():
     assert reported_events[2][1]["tool_succeeded"] is True
     assert reported_events[3][1]["tokens_in"] == 25
     assert client.messages.calls[0]["system"] == "triage system"
+
+
+def test_bound_tool_arguments_override_model_values():
+    responses = [
+        tool_use_response(
+            "find_duplicate_enquiry_candidates",
+            {
+                "exclude_enquiry_id": "ENQ-001",
+                "received_before": "2099-01-01",
+                "email": "alex.morgan@example.com",
+            },
+        ),
+        text_response("Done."),
+    ]
+    client = FakeAnthropicClient(responses)
+
+    _, messages = af.run_tool_loop(
+        [{"role": "user", "content": "Check duplicates for ENQ-011"}],
+        client,
+        JsonStore(),
+        "triage system",
+        tool_schemas=TRIAGE_SCHEMA_LIST,
+        bound_tool_arguments={
+            "find_duplicate_enquiry_candidates": {
+                "exclude_enquiry_id": "ENQ-011",
+                "received_before": "2026-10-24",
+            }
+        },
+    )
+    tool_result = json.loads(messages[-2]["content"][0]["content"])
+
+    assert tool_result["count"] == 1
+    assert tool_result["candidates"][0]["enquiry_id"] == "ENQ-001"

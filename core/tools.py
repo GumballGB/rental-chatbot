@@ -4,6 +4,7 @@ import json
 
 from core.store import JsonStore, NotFoundError
 
+### MAIN TOOLS ###
 
 # tool functions for getting a listing
 def get_listing(store: JsonStore, listing_id: str) -> str:
@@ -109,6 +110,7 @@ GET_LOCATION_BY_NAME_SCHEMA = {
     },
 }
 
+### SEARCH TOOLS ###
 
 def search_listings(store: JsonStore, **filters) -> str:
     try:
@@ -180,12 +182,118 @@ SEARCH_LISTINGS_SCHEMA = {
     },
 }
 
-# Schema list
-SCHEMA_LIST = [
+### ENQUIRY TOOLS ###
+
+# generic enquiry retrieval tool for getting an enquiry
+def get_enquiry(store: JsonStore, enquiry_id: str) -> str:
+    try:
+        return store.get_enquiry(enquiry_id).model_dump_json()
+    except NotFoundError as error:
+        return json.dumps({"error": str(error)})
+
+
+GET_ENQUIRY_SCHEMA = {
+    "name": "get_enquiry",
+    "description": "Retrieve one historical rental enquiry by its exact enquiry ID.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "enquiry_id": {
+                "type": "string",
+                "description": "The exact enquiry ID to retrieve.",
+            }
+        },
+        "required": ["enquiry_id"],
+    },
+}
+
+# Specific tool for finding potential duplicate enquiries
+def find_duplicate_enquiry_candidates(
+    store: JsonStore,
+    exclude_enquiry_id: str,
+    received_before: str,
+    email: str | None = None,
+    phone: str | None = None,
+    name: str | None = None,
+    listing_id: str | None = None,
+    move_in_date: str | None = None,
+) -> str:
+    """
+    Find potential duplicate enquiries based on email, phone, name, listing ID, and move-in date.
+
+    Args:
+        store (JsonStore): The JSON store containing enquiries.
+        exclude_enquiry_id (str): The enquiry ID to exclude from the search.
+        email (str | None): The email to match.
+        phone (str | None): The phone number to match.
+        name (str | None): The name to match.
+        listing_id (str | None): The listing ID to match.
+        move_in_date (str | None): The move-in date to match.
+
+    Returns:
+        str: A JSON string containing the count and list of candidate enquiries.
+    """
+    try:
+
+        candidates = store.find_duplicate_enquiry_candidates(
+            exclude_enquiry_id=exclude_enquiry_id,
+            received_before=received_before,
+            email=email,
+            phone=phone,
+            name=name,
+            listing_id=listing_id,
+            move_in_date=move_in_date,
+        )
+    except ValueError as error:
+        return json.dumps({"error": str(error)})
+
+    return json.dumps(
+        {
+            "count": len(candidates),
+            "candidates": [
+                {
+                    **enquiry.model_dump(mode="json"),
+                    "matched_on": matched_on,
+                }
+                for enquiry, matched_on in candidates
+            ],
+        }
+    )
+
+
+FIND_DUPLICATE_ENQUIRY_CANDIDATES_SCHEMA = {
+    "name": "find_duplicate_enquiry_candidates",
+    "description": (
+        "Find historical enquiries that may duplicate the current enquiry. "
+        "Always exclude the enquiry currently being triaged."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "email": {"type": "string"},
+            "phone": {"type": "string"},
+            "name": {"type": "string"},
+            "listing_id": {"type": "string"},
+            "move_in_date": {"type": "string"},
+        },
+    },
+}
+
+# List of schemas for different tool categories
+
+CHATBOT_SCHEMA_LIST = [
     GET_LISTING_SCHEMA,
     GET_BUILDING_SCHEMA,
     GET_LOCATION_BY_NAME_SCHEMA,
     SEARCH_LISTINGS_SCHEMA,
+]
+
+TRIAGE_SCHEMA_LIST = [
+    GET_LISTING_SCHEMA,
+    GET_BUILDING_SCHEMA,
+    GET_LOCATION_BY_NAME_SCHEMA,
+    GET_ENQUIRY_SCHEMA,
+    FIND_DUPLICATE_ENQUIRY_CANDIDATES_SCHEMA,
 ]
 
 # Lookup dict
@@ -194,12 +302,19 @@ LOOKUP_DICT = {
     "get_building": get_building,
     "get_location_by_name": get_location_by_name,
     "search_listings": search_listings,
+    "get_enquiry": get_enquiry,
+    "find_duplicate_enquiry_candidates": find_duplicate_enquiry_candidates,
 }
 
 
 # function for running the tools
 # Generated with copilot, placeholder
-def run_tool(tool_name: str, store: JsonStore, **kwargs) -> str:
+def run_tool(
+    tool_name: str,
+    store: JsonStore,
+    allowed_tool_names: set[str],
+    **kwargs,
+) -> str:
     """
     Run a tool by its name with the given store and arguments.
 
@@ -212,6 +327,9 @@ def run_tool(tool_name: str, store: JsonStore, **kwargs) -> str:
     Returns:
         str: The JSON string result of the tool execution or an error message.
     """
+
+    if tool_name not in allowed_tool_names:
+        return json.dumps({"error": f"Tool {tool_name} is not allowed."})
 
     if tool_name not in LOOKUP_DICT:
         return json.dumps({"error": f"Tool {tool_name} not found."})
