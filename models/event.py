@@ -6,7 +6,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
 
-from models.recommendation import Recommendation
+from models.recommendation import Label, Recommendation
 
 
 class Event(BaseModel):
@@ -49,15 +49,13 @@ class Event(BaseModel):
 
     # Specific to run_finished events
     run_succeeded: bool | None = None
-    final_label: Literal["genuine", "needs_info", "spam", "duplicate"] | None = None
+    final_label: Label | None = None
 
     @model_validator(mode="after")
     def validate_type_specific_fields(self):
 
-        if self.type == "run_started":
-
-            if self.model is None:
-                raise ValueError("model is required for run_started events.")
+        if self.type == "run_started" and self.model is None:
+            raise ValueError("model is required for run_started events.")
 
         # If it is a model_call event, ensure that model, tokens_in, and tokens_out are present
         if self.type == "model_call":
@@ -94,10 +92,8 @@ class Event(BaseModel):
             if self.guard_result_reason is None:
                 raise ValueError("guard_result_reason is required for guard_result events.")
 
-        if self.type == "recommendation":
-
-            if self.recommendation is None:
-                raise ValueError("recommendation is required for recommendation events.")
+        if self.type == "recommendation" and self.recommendation is None:
+            raise ValueError("recommendation is required for recommendation events.")
 
         if self.type == "run_finished":
             

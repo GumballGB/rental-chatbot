@@ -4,7 +4,6 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, StringConstraints, model_validator
 
-
 class Evidence(BaseModel):
     source: Literal["message", "tool_result"]
     quote: Annotated[str, StringConstraints(strip_whitespace=True, min_length=8)]
