@@ -72,6 +72,14 @@ if the required recommendation file is missing. This terminal workflow supports
 one reviewer at a time; concurrent reviewers are outside its scope (see DECISIONS.md).
 Review listings must read only *.json files.
 
+core.manual_review.load_review_item(review_path, output_dir) loads a ReviewItem
+containing the review, full enquiry, and recommendation, and validates their links.
+Missing, corrupt, or inconsistent files raise ReviewLoadError.
+
+core.manual_review.find_pending_reviews(output_dir) returns (items, warnings).
+It excludes decided reviews and skips broken items with a warning. Items sort by
+received_date (oldest first, missing dates last), then enquiry ID and run ID.
+These functions only read files; warnings are returned for the interface to show.
 The interactive manual_review interface is still a placeholder.
 
 -**-**- DATA GOVERNANCE -**-**-
