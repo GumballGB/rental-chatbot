@@ -152,6 +152,70 @@ def find_pending_reviews(output_dir: str | Path = DEFAULT_OUTPUT_DIR) -> tuple[l
     ))
     return items, warnings
 
+# Helper function to display a value or a marker for missing values.
+def _display_value(value: str | int | None) -> str:
+    """Use one marker for missing values, preserving zero and supplied text."""
+
+    return "not provided" if value is None or value == "" else str(value)
+
+
+def render_review_item(item: ReviewItem, position: int, total: int) -> str:
+    """
+    Return the review display using a one-based position supplied by the caller.
+
+    Includes the full enquiry, recommendation, and evidence. Message text is
+    preserved between labelled separators. Rendering only returns a string;
+    it does not print, prompt, load files, or change the item.
+
+    args:
+        item: The ReviewItem to render.
+        position: The one-based position of this review in the list of pending reviews.
+        total: The total number of pending reviews.
+    returns:
+        A string containing the formatted review display, including the header, 
+        enquiry details, recommendation, and evidence.
+    """
+
+    enquiry = item.enquiry
+    recommendation = item.recommendation
+    budget = "not provided" # budget and currency are displayed together, so we start with a default for both.
+
+    # If either the budget or currency is provided, display them together.
+    if enquiry.budget is not None or enquiry.budget_currency is not None:
+        budget = f"{_display_value(enquiry.budget)} {_display_value(enquiry.budget_currency)}"
+
+    # Build the lines of the review display, including the header, enquiry details, recommendation, and evidence.
+    lines = [
+        f"Review {position} of {total}",
+        f"Enquiry: {enquiry.enquiry_id}",
+        f"Run: {item.review.run_id}",
+        f"Received: {_display_value(enquiry.received_date)}",
+        "",
+        f"Name: {_display_value(enquiry.name)}",
+        f"Email: {_display_value(enquiry.email)}",
+        f"Phone: {_display_value(enquiry.phone)}",
+        f"Listing: {_display_value(enquiry.listing_id)}",
+        f"Budget: {budget}",
+        f"Move-in date: {_display_value(enquiry.move_in_date)}",
+        "",
+        "--- Enquiry message (verbatim) ---",
+        _display_value(enquiry.message),
+        "--- End enquiry message ---",
+        "",
+        f"Recommended label: {recommendation.label}",
+    ]
+    if recommendation.label == "duplicate":
+        lines.append(f"Duplicate of: {recommendation.duplicated_enquiry_id}")
+    lines.extend(["", "Reason:", recommendation.reason, "", "Evidence:"])
+
+    # Add each evidence item with its source, quote, and support.
+    for index, evidence in enumerate(recommendation.evidence, start=1):
+        lines.extend([
+            f'{index}. [{evidence.source}] "{evidence.quote}"',
+            f"   Support: {evidence.support}",
+        ])
+    return "\n".join(lines) + "\n"
+
 
 def manual_review():
 
