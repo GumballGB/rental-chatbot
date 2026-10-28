@@ -4,6 +4,9 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, StringConstraints, model_validator
 
+Label = Literal["genuine", "needs_info", "spam", "duplicate"]
+
+
 class Evidence(BaseModel):
     source: Literal["message", "tool_result"]
     quote: Annotated[str, StringConstraints(strip_whitespace=True, min_length=8)]
@@ -14,7 +17,7 @@ class Recommendation(BaseModel):
 
     referred_enquiry_id: str
     duplicated_enquiry_id: str | None = None
-    label: Literal["genuine", "needs_info", "spam", "duplicate"]
+    label: Label
     reason: str
     evidence: list[Evidence] = Field(min_length=1, max_length=5)
 

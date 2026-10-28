@@ -4,12 +4,18 @@ from pathlib import Path
 from uuid import uuid4
 
 from agents.anthropic_functions import MODEL, parse_model_json, run_tool_loop
+
+# The core
 from core.audit import DEFAULT_AUDIT_DIR, write_event
 from core.evidence import find_evidence_failures
 from core.tools import TRIAGE_SCHEMA_LIST
+from core.writer import DEFAULT_OUTPUT_DIR, save_for_review
+
+# The models
 from models.enquiry import Enquiry
 from models.event import Event
 from models.recommendation import Recommendation
+from models.triage_result import TriageResult
 
 TRIAGE_SYSTEM_PROMPT = """
 You triage rental enquiries into one of these labels:
@@ -67,28 +73,31 @@ def handle_loop_event(
     audit_event(triage_run_id, enquiry, audit_dir, event_type, **details)
 
 # Big function to triage a rental enquiry into a recommendation, it first runs the
-# tool loop to gather information and then validates the evidence before returning a recommendation.
+# tool loop to gather information and then validates the evidence before returning the result.
 def triage_enquiry(
     enquiry: Enquiry,
     client,
     data_store,
     audit_dir: str | Path = DEFAULT_AUDIT_DIR,
-) -> Recommendation:
+    output_dir: str | Path | None = DEFAULT_OUTPUT_DIR,
+) -> TriageResult:
     """
     Triage a rental enquiry into a recommendation. This function runs a tool loop to gather 
-    additional information for triage, validates the evidence, and returns a Recommendation object.
+    additional information for triage, validates the evidence, and returns a TriageResult.
     
-    The returned Recommendation object contains the final label, reason, and evidence
-    for the triage decision.
+    The result pairs the application-generated run ID with the validated recommendation,
+    which contains the label, reason, and evidence for the triage decision.
     
     Parameters:
         enquiry (Enquiry): The rental enquiry to be triaged.
         client: The client used to run the tool loop.
         data_store: The data store used to fetch additional information.
         audit_dir (str | Path, optional): Directory to store audit logs. Defaults to DEFAULT_AUDIT_DIR.
+        output_dir: Directory for the enquiry, recommendation, and pending review.
+            None skips these saves; audit logging still uses audit_dir.
 
     Returns:
-        Recommendation: The final recommendation for the triage decision.
+        TriageResult: The run ID and validated recommendation for the triage decision.
     """
 
     # An event ID for this run, note runs are only for triage events.
@@ -223,9 +232,15 @@ def triage_enquiry(
         if not guard_passed:
             raise ValueError(f"Recommendation failed evidence check: {guard_reason}")
 
+        # -*-*- SAVING PHASE -*-*-
+
+        result = TriageResult(run_id=triage_run_id, recommendation=recommendation)
+        if output_dir is not None:
+            save_for_review(enquiry, result, output_dir)
+
         final_label = recommendation.label
         run_succeeded = True
-        return recommendation
+        return result
 
     # Audit the final decision for this triage run (EVENT)
     finally:

@@ -2,16 +2,19 @@
 # This agent handles the interaction with users for rental enquiries, gathers information,
 # and converts it into structured Enquiry objects using a two-phase approach: natural language loop and extraction.
 
+from pathlib import Path
+
 from agents.anthropic_functions import (
     TOOL_SYSTEM_PROMPT,
     create_enquiry,
     extract_enquiry_unit_enquiry,
     run_tool_loop,
 )
+from core.writer import DEFAULT_OUTPUT_DIR, save_enquiry
 
 
 # The function to run the CHAT BOT for rental enquiries, generates an Enquiry object.
-def run_rental_chat(client, data_store):
+def run_rental_chat(client, data_store, output_dir: str | Path | None = DEFAULT_OUTPUT_DIR):
     """
     Run the rental chat with the user, gather information, and create an Enquiry object.
     There are two major phases in this function: the natural language loop phase,
@@ -21,6 +24,7 @@ def run_rental_chat(client, data_store):
     Args:
         client: The Anthropic client used for interacting with the model.
         data_store (JsonStore): The data store containing listing information.
+        output_dir: Directory for the saved enquiry. None skips saving.
 
     Returns:
         tuple: A tuple containing the created Enquiry object and a set of declined fields.
@@ -90,5 +94,10 @@ def run_rental_chat(client, data_store):
 
     # Finally, create the enquiry object from the extracted unit enquiry.
     enquiry = create_enquiry(unit_enquiry.model_dump(), data_store)
+
+    # -*-*- SAVING PHASE -*-*-
+
+    if output_dir is not None:
+        save_enquiry(enquiry, output_dir)
 
     return enquiry, declined_fields

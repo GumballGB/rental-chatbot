@@ -40,6 +40,48 @@ To run testing, make sure you pip install the requirements-dev.txt file
 
 python -m pytest
 
+-**-**- RUNTIME OUTPUT AND HUMAN REVIEW -**-**-
+
+run_rental_chat saves the complete enquiry after extraction. triage_enquiry
+saves the enquiry, the guarded recommendation, and a pending Review:
+
+output/enquiries/<enquiry_id>.json
+output/recommendations/<run_id>.json
+output/reviews/<enquiry_id>/<run_id>.json
+
+The data/ seed files stay unchanged. output/ is runtime state and is ignored by git.
+Both functions accept output_dir (default: the project's output/ directory).
+Pass output_dir=None to skip saving runtime output; triage audit logging still
+uses audit_dir. Tests should pass tmp_path or None.
+
+The writer uses readable, indented JSON. Each file is written to a temporary
+file in the destination folder, then renamed into place. The pending review is
+saved last so it only appears after both bodies are available. This is atomic
+per file, not a transaction across all three files.
+
+A human decision is saved to the same review path using core.writer.save_review.
+Construct a validated Review with decision approved or overridden, the reviewer,
+review_date, and final outcome; overrides also require a message. The original
+recommendation stays in its own file. Pending reviews have decision="pending".
+Each new triage run gets a separate recommendation and review.
+
+Once a review is approved or overridden it cannot be replaced, including by an
+identical decision or a reset to pending. save_review raises
+ReviewAlreadyDecidedError for these attempts, and RecommendationNotFoundError
+if the required recommendation file is missing. This terminal workflow supports
+one reviewer at a time; concurrent reviewers are outside its scope (see DECISIONS.md).
+Review listings must read only *.json files.
+
+The interactive manual_review interface is still a placeholder.
+
+-**-**- DATA GOVERNANCE -**-**-
+
+output/ contains full enquiry bodies, including names, email addresses, and
+phone numbers. Treat it as personal data. Git ignore prevents accidental
+tracking; it does not encrypt the files or restrict access to them. Keep these
+runtime files out of source control and restrict access when sharing or backing
+up the project.
+
 
 
 
