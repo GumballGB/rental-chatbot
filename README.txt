@@ -76,8 +76,6 @@ core.manual_review.load_review_item(review_path, output_dir) loads a ReviewItem
 containing the review, full enquiry, and recommendation, and validates their links.
 Missing, corrupt, or inconsistent files raise ReviewLoadError.
 
-The interactive manual_review interface is still a placeholder.
-
 -**-**- DATA GOVERNANCE -**-**-
 
 output/ contains full enquiry bodies, including names, email addresses, and

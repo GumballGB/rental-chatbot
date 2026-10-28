@@ -1,13 +1,14 @@
 # File dedicated to having a human review process for rental enquiries and recommendations (HITL).
 
 import re
-from datetime import date
+from collections.abc import Callable
+from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import TypeVar
+from typing import Literal, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
-from core.writer import DEFAULT_OUTPUT_DIR
+from core.writer import DEFAULT_OUTPUT_DIR, save_review
 from models.enquiry import Enquiry
 from models.recommendation import Recommendation
 from models.review import Review
@@ -217,9 +218,100 @@ def render_review_item(item: ReviewItem, position: int, total: int) -> str:
     return "\n".join(lines) + "\n"
 
 
+def ask_for_decision(
+    item: ReviewItem,
+    reviewer: str,
+    ask: Callable[[str], str] = input,
+    show: Callable[[str], None] = print,
+) -> Review | Literal["skip", "quit"]:
+    """
+    Collect a validated human decision without saving or changing the item.
+
+    The menu accepts a/o/s/q, ignoring case and surrounding whitespace.
+    An empty approval comment becomes None. Overrides require an explanation
+    and a changed outcome; duplicate outcomes also require an enquiry ID.
+    Invalid overrides display the Review validation error and repeat the form.
+    Skip and quit return distinct strings. EOF or Ctrl-C at any prompt quits.
+    """
+
+    # Display the review item to the reviewer. It consists of a nested while loop.
+    try:
+
+        while True:
+
+            # Display the review item to the reviewer.
+            choice = ask("Decision: [a]pprove, [o]verride, [s]kip, [q]uit: ").strip().casefold()
+
+            # Handle the skip and quit options, returning distinct strings for each.
+            if choice == "s":
+                return "skip"
+            if choice == "q":
+                return "quit"
+            if choice not in {"a", "o"}:
+                show("Unrecognised choice. Choose a, o, s, or q.")
+                continue
+
+            # Handle the approve and override options, collecting the necessary information from the reviewer.
+            while True:
+
+                # If reviewer chooses to approve, use the recommended label and duplicate ID,
+                # and collect an optional comment.
+                if choice == "a":
+
+                    final_label = item.review.recommended_label
+                    duplicate_id = item.review.recommended_duplicated_enquiry_id
+
+                    message = ask("Comment (optional; Enter for none): ").strip() or None
+
+                else:
+
+                    final_label = ask(
+                        "New label (genuine, needs_info, spam, duplicate): "
+                    ).strip().casefold()
+                    duplicate_id = None
+
+                    # If the final label is "duplicate", prompt for the duplicate enquiry ID.
+                    if final_label == "duplicate":
+                        duplicate_id = ask("Duplicate enquiry ID: ").strip() or None
+
+                    message = ask("Explanation for override (required): ").strip() or None
+
+                # Validate the override requirements: explanation is required,
+                # and the final outcome must differ from the recommended outcome.
+                try:
+
+                    decision_state = "approved" if choice == "a" else "overridden"
+
+                    # Construct a new Review so its validators check the whole decision.
+                    return Review.model_validate({
+                        **item.review.model_dump(),
+                        "decision": decision_state,
+                        "reviewer": reviewer,
+                        "review_date": datetime.now(UTC),
+                        "message": message,
+                        "final_label": final_label,
+                        "final_duplicated_enquiry_id": duplicate_id,
+                    })
+
+                # If the validation fails, display the error and repeat the form.
+                except ValidationError as error:
+
+                    show(f"Invalid review: {error}")
+
+    # If somehow the try did not work, we catch EOFError and KeyboardInterrupt to return "quit" without crashing.
+    except (EOFError, KeyboardInterrupt):
+        return "quit"
+
+
 def manual_review():
+    """
+    The main function for the manual review process. It finds pending reviews,
+    displays them to the reviewer, and collects decisions.
+    """
 
     print("Manual review process started.")
+
+    # -*-*- FIND PENDING REVIEWS PHASE -*-*- #
 
     # Load pending reviews and any warnings about broken items.
     pending_reviews, warnings = find_pending_reviews()
@@ -234,3 +326,25 @@ def manual_review():
     print("Pending reviews:")
     for item in pending_reviews:
         print(f"  - Review for enquiry {item.review.enquiry_id}, run {item.review.run_id}, recommended label: {item.review.recommended_label}")
+
+    # -*-*- DECISION PHASE -*-*- #
+
+    # For each pending review, ask the human reviewer for a decision.
+    # Have an enumerate to sort of emulate a queue.
+    for index, item in enumerate(pending_reviews, start=1):
+
+        print(f"\nReview {index} of {len(pending_reviews)}:")
+        print(render_review_item(item, index, len(pending_reviews)))
+
+        decision = ask_for_decision(item, reviewer="Anslean")
+
+        if decision == "skip":
+            print("Skipping this review.")
+            continue
+        elif decision == "quit":
+            print("Quitting the manual review process.")
+            break
+        else:
+            # Save the decided review to its file. Atomic style
+            review_path = save_review(decision, DEFAULT_OUTPUT_DIR)
+            print(f"Saved decision for review {item.review.run_id} to {review_path}")
