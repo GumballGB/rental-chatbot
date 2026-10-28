@@ -8,7 +8,7 @@ from typing import Literal, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
-from core.writer import DEFAULT_OUTPUT_DIR, save_review
+from core.writer import DEFAULT_OUTPUT_DIR, ReviewAlreadyDecidedError, save_review
 from models.enquiry import Enquiry
 from models.recommendation import Recommendation
 from models.review import Review
@@ -303,48 +303,86 @@ def ask_for_decision(
         return "quit"
 
 
-def manual_review():
+def run_manual_review(
+    output_dir: str | Path = DEFAULT_OUTPUT_DIR,
+    reviewer: str = "admin",
+    ask: Callable[[str], str] = input,
+    show: Callable[[str], None] = print,
+) -> dict[str, int]:
     """
-    The main function for the manual review process. It finds pending reviews,
-    displays them to the reviewer, and collects decisions.
-    """
+    Find pending reviews, display each item, collect decisions, and save them.
 
-    print("Manual review process started.")
+    Count approvals and overrides only after a successful save. Explicit skips
+    and already-decided items count as skipped. Discovery warnings and
+    already-decided items count as warned. Quitting leaves the current and
+    unvisited items unchanged without counting them as skipped.
+
+    We use the ask and show callables to allow for testing without keyboard input or output.
+
+    Other saving errors propagate to the caller. Tests can supply a temporary
+    output directory and replace ask and show without keyboard interaction.
+    """
+    show("Manual review process started.")
+    output_path = Path(output_dir)
 
     # -*-*- FIND PENDING REVIEWS PHASE -*-*- #
 
-    # Load pending reviews and any warnings about broken items.
-    pending_reviews, warnings = find_pending_reviews()
+    pending_reviews, warnings = find_pending_reviews(output_path)
+    counts = {"approved": 0, "overridden": 0, "skipped": 0, "warned": len(warnings)}
+    total = len(pending_reviews)
+    show(f"Found {total} pending reviews.")
 
-    print(f"Found {len(pending_reviews)} pending reviews.")
-
-    # Display warnings about broken items, if any.
-    print("Warnings about broken items:")
     for warning in warnings:
-        print(f"  - {warning}")
-    
-    print("Pending reviews:")
-    for item in pending_reviews:
-        print(f"  - Review for enquiry {item.review.enquiry_id}, run {item.review.run_id}, recommended label: {item.review.recommended_label}")
+        show(f"Warning: {warning}")
 
     # -*-*- DECISION PHASE -*-*- #
 
-    # For each pending review, ask the human reviewer for a decision.
-    # Have an enumerate to sort of emulate a queue.
-    for index, item in enumerate(pending_reviews, start=1):
+    for position, item in enumerate(pending_reviews, start=1):
 
-        print(f"\nReview {index} of {len(pending_reviews)}:")
-        print(render_review_item(item, index, len(pending_reviews)))
-
-        decision = ask_for_decision(item, reviewer="Anslean")
+        # Display the review item and collect a decision from the reviewer.
+        review_path = output_path / "reviews" / item.review.enquiry_id / f"{item.review.run_id}.json"
+        show(render_review_item(item, position, total))
+        decision = ask_for_decision(item, reviewer=reviewer, ask=ask, show=show)
 
         if decision == "skip":
-            print("Skipping this review.")
+            counts["skipped"] += 1
+            show(f"Skipping review {review_path}.")
             continue
-        elif decision == "quit":
-            print("Quitting the manual review process.")
+        if decision == "quit":
+            show("Quitting the manual review process.")
             break
-        else:
-            # Save the decided review to its file. Atomic style
-            review_path = save_review(decision, DEFAULT_OUTPUT_DIR)
-            print(f"Saved decision for review {item.review.run_id} to {review_path}")
+
+        # Save the decision to the output directory, handling already-decided reviews.
+        try:
+            saved_path = save_review(decision, output_path)
+        except ReviewAlreadyDecidedError as error:
+            counts["skipped"] += 1
+            counts["warned"] += 1
+            show(f"Skipping review {review_path}: {error}")
+            continue
+
+        counts[decision.decision] += 1
+        show(f"Saved decision for review {item.review.run_id} to {saved_path}")
+
+    show(
+        f"Review summary: {counts['approved']} approved, {counts['overridden']} overridden, "
+        f"{counts['skipped']} skipped, {counts['warned']} warned."
+    )
+    return counts
+
+# Thin wrapper now, asks for reviwer name
+def manual_review() -> dict[str, int] | None:
+    """Read the reviewer name and start a terminal review session."""
+
+    # -*-*- REVIEWER NAME PHASE -*-*- #
+    try:
+        reviewer = input("Reviewer name [admin]: ").strip() or "admin"
+    except (EOFError, KeyboardInterrupt):
+        return None
+
+    # -*-*- MANUAL REVIEW PHASE -*-*- #
+    return run_manual_review(reviewer=reviewer)
+
+
+if __name__ == "__main__":
+    manual_review()

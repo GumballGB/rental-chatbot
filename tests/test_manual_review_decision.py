@@ -5,8 +5,7 @@ from uuid import UUID
 
 import pytest
 
-from core.manual_review import ask_for_decision
-from core.manual_review import manual_review as run_manual_review
+from core.manual_review import ask_for_decision, run_manual_review
 from core.writer import save_for_review
 from models.enquiry import Enquiry
 from models.recommendation import Recommendation
@@ -216,12 +215,13 @@ def test_manual_review_saves_a_decided_review_to_the_output_directory(
         "final_label": "genuine" if decision == "approved" else "needs_info",
         "message": None if decision == "approved" else "Clarify move-in date.",
     })
-    monkeypatch.setattr("core.manual_review.DEFAULT_OUTPUT_DIR", tmp_path)
-    monkeypatch.setattr("core.manual_review.find_pending_reviews", lambda: ([item], []))
     monkeypatch.setattr("core.manual_review.ask_for_decision", lambda *args, **kwargs: decided)
-    monkeypatch.setattr("builtins.print", lambda *args, **kwargs: None)
 
-    run_manual_review()
+    counts = run_manual_review(
+        output_dir=tmp_path, reviewer="Anslean",
+        ask=lambda prompt: pytest.fail("Unexpected keyboard input"), show=lambda text: None,
+    )
 
     path = tmp_path / "reviews" / item.review.enquiry_id / f"{item.review.run_id}.json"
     assert Review.model_validate_json(path.read_text(encoding="utf-8")) == decided
+    assert counts[decision] == 1

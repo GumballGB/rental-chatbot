@@ -76,6 +76,33 @@ core.manual_review.load_review_item(review_path, output_dir) loads a ReviewItem
 containing the review, full enquiry, and recommendation, and validates their links.
 Missing, corrupt, or inconsistent files raise ReviewLoadError.
 
+-**-**- RUN MANUAL REVIEW -**-**-
+
+From the project root with the virtual environment active, run:
+
+python -m core.manual_review
+
+Use this module command rather than python core/manual_review.py. Running the
+file directly does not put the project root on Python's import path, so imports
+from core and models can fail. The runpy test checks the entry-point guard,
+not direct-file execution outside pytest.
+
+Enter the reviewer name (Enter uses admin). Review each enquiry and use a to
+approve, o to override, s to skip, or q to quit. Overrides require an explanation
+and a duplicate enquiry ID if the final label is duplicate. Approval comments
+are optional. EOF or Ctrl-C during a decision quits without saving that item.
+
+The loop saves each decided Review through the atomic writer. Skip and quit
+leave pending files unchanged. An already-decided item is reported and skipped;
+other saving errors propagate. The session ends with counts for approved,
+overridden, skipped, and warned. Already-decided items count as both skipped
+and warned. Unvisited items after quitting are not counted as skipped.
+
+core.manual_review.run_manual_review(output_dir, reviewer, ask, show) returns
+these counts as a dictionary. Defaults are the project's output/ directory,
+admin, input, and print. Tests pass tmp_path, scripted answers, and a collector
+for displayed text; no keyboard or model calls are needed.
+
 -**-**- DATA GOVERNANCE -**-**-
 
 output/ contains full enquiry bodies, including names, email addresses, and
