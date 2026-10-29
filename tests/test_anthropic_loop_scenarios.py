@@ -139,7 +139,7 @@ def test_bound_tool_arguments_override_model_values():
             {
                 "exclude_enquiry_id": "ENQ-001",
                 "received_before": "2099-01-01",
-                "email": "alex.morgan@example.com",
+                "email": "wrong@example.com",
             },
         ),
         text_response("Done."),
@@ -156,6 +156,7 @@ def test_bound_tool_arguments_override_model_values():
             "find_duplicate_enquiry_candidates": {
                 "exclude_enquiry_id": "ENQ-011",
                 "received_before": "2026-10-24",
+                "email": "alex.morgan@example.com",
             }
         },
     )

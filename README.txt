@@ -128,6 +128,26 @@ this is not a complete PII detector.
 Other message text and the original Enquiry are preserved. The filtered view
 omits name, email, and phone fields.
 
+triage_enquiry now uses this filtered view for its initial model request and
+checks message evidence against the same redacted text. The original enquiry
+is unchanged and still saved for human review. The fake-client test verifies
+that its example name, email, and phone do not appear in the initial request.
+
+The duplicate tool takes no model-supplied arguments. The application binds the
+original contacts, listing, dates, and enquiry ID directly to local matching.
+The prompt instructs triage to call it first; it returns filtered candidates and
+matched_on fields. get_enquiry returns the same filtered view. Private name,
+email, and phone arguments are omitted from triage tool-call audit events.
+
+Tool-loop tests use email, phone, and name-based matches without model-supplied
+contact values. They inspect every fake-client request, both historical tool
+results, and audit events for the fixture contacts. These tests exercise the
+application's data handling; they do not prove a live model will follow the
+prompt or that the heuristic catches all PII.
+
+Human review retains the original enquiry and displays a note explaining that
+evidence quotes use the redacted text seen by triage.
+
 
 output/ contains full enquiry bodies, including names, email addresses, and
 phone numbers. Treat it as personal data. Git ignore prevents accidental

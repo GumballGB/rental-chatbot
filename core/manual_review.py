@@ -205,9 +205,17 @@ def render_review_item(item: ReviewItem, position: int, total: int) -> str:
         "",
         f"Recommended label: {recommendation.label}",
     ]
+
+    # If the recommendation is a duplicate, include the duplicated enquiry ID in the display.
     if recommendation.label == "duplicate":
         lines.append(f"Duplicate of: {recommendation.duplicated_enquiry_id}")
-    lines.extend(["", "Reason:", recommendation.reason, "", "Evidence:"])
+    lines.extend([
+        "", "Reason:", recommendation.reason, "", "Evidence:",
+        (
+            "Note: Evidence quotes use the redacted text seen by triage; "
+            "the original enquiry message is shown above."
+        ),
+    ])
 
     # Add each evidence item with its source, quote, and support.
     for index, evidence in enumerate(recommendation.evidence, start=1):

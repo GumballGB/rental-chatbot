@@ -28,6 +28,102 @@ def make_enquiry():
     )
 
 
+def make_pii_enquiry():
+    return Enquiry(
+        enquiry_id="ENQ-pii-test",
+        name="Amélie Tremblay",
+        email="amelie.tremblay@example.com",
+        phone="+1 514 555 0123",
+        received_date="2026-10-29",
+        message=(
+            "Hi, I'm Amélie Tremblay. I am looking for a studio in Griffintown. "
+            "Email amelie.tremblay@example.com or call +1 514 555 0123."
+        ),
+    )
+
+
+def test_triage_requests_do_not_include_contact_details(tmp_path):
+    enquiry = make_pii_enquiry()
+    # Use an unaffected quote so a privacy failure is separate from evidence validation.
+    recommendation_data = {
+        "referred_enquiry_id": enquiry.enquiry_id,
+        "label": "genuine",
+        "reason": "The enquiry contains clear rental intent.",
+        "evidence": [{
+            "source": "message",
+            "quote": "looking for a studio in Griffintown",
+            "support": "Provides a concrete rental request.",
+        }],
+    }
+    client = FakeAnthropicClient([text_response(json.dumps(recommendation_data))])
+
+    triage_enquiry(
+        enquiry, client, JsonStore(), audit_dir=tmp_path / "audit", output_dir=None,
+    )
+
+    assert client.messages.calls, "Triage must actually make a model request."
+    requests = json.dumps(client.messages.calls, ensure_ascii=False)
+    assert "looking for a studio in Griffintown" in requests
+    leaked_fields = [
+        field for field in ("name", "email", "phone")
+        if getattr(enquiry, field) in requests
+    ]
+    assert leaked_fields == [], f"Triage sent personal fields to the model: {leaked_fields}"
+    assert "[NAME]" in requests
+    assert "[EMAIL]" in requests
+    assert "[PHONE]" in requests
+
+
+@pytest.mark.parametrize(("quote", "accepted"), [
+    ("Email [EMAIL] or call [PHONE].", True),
+    ("Hi, I'm [NAME].", True),
+    ("Email amelie.tremblay@example.com", False),
+    ("call +1 514 555 0123.", False),
+    ("Hi, I'm Amélie Tremblay.", False),
+    ("Email [EMAIL] or call [PHONE] tomorrow.", False),
+])
+def test_triage_checks_evidence_against_the_message_sent_to_the_model(tmp_path, quote, accepted):
+    enquiry = make_pii_enquiry()
+    original = enquiry.model_dump()
+    recommendation_data = {
+        "referred_enquiry_id": enquiry.enquiry_id,
+        "label": "genuine",
+        "reason": "The enquiry contains a rental request.",
+        "evidence": [{
+            "source": "message",
+            "quote": quote,
+            "support": "Quotes the supplied enquiry message.",
+        }],
+    }
+    client = FakeAnthropicClient([text_response(json.dumps(recommendation_data))])
+    audit_dir = tmp_path / "audit"
+    output_dir = tmp_path / "output"
+
+    if accepted:
+        result = triage_enquiry(
+            enquiry, client, JsonStore(), audit_dir=audit_dir, output_dir=output_dir,
+        )
+        assert result.recommendation.evidence[0].quote == quote
+        saved_enquiry = Enquiry.model_validate_json(
+            (output_dir / "enquiries" / f"{enquiry.enquiry_id}.json").read_text(encoding="utf-8")
+        )
+        assert saved_enquiry.model_dump() == original
+        message = client.messages.calls[0]["messages"][0]["content"]
+        assert quote in message
+    else:
+        with pytest.raises(ValueError, match="failed evidence check"):
+            triage_enquiry(
+                enquiry, client, JsonStore(), audit_dir=audit_dir, output_dir=output_dir,
+            )
+        assert not output_dir.exists()
+
+    events = read_events(next(audit_dir.glob("*.jsonl")))
+    evidence_guard = next(event for event in events if event.guard == "evidence_check")
+    assert evidence_guard.guard_passed is accepted
+    assert events[-1].run_succeeded is accepted
+    assert enquiry.model_dump() == original
+
+
 def test_triage_writes_events_as_they_happen(tmp_path):
     recommendation_data = {
         "referred_enquiry_id": "ENQ-001",

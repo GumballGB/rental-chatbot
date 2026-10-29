@@ -1,3 +1,4 @@
+import json
 from datetime import UTC, datetime
 from functools import partial
 from pathlib import Path
@@ -8,6 +9,7 @@ from agents.anthropic_functions import MODEL, parse_model_json, run_tool_loop
 # The core
 from core.audit import DEFAULT_AUDIT_DIR, write_event
 from core.evidence import find_evidence_failures
+from core.pii import enquiry_for_triage
 from core.tools import TRIAGE_SCHEMA_LIST
 from core.writer import DEFAULT_OUTPUT_DIR, save_for_review
 
@@ -22,9 +24,11 @@ You triage rental enquiries into one of these labels:
 genuine, needs_info, spam, or duplicate.
 
 Use tools when they can verify claims about listings, buildings, or locations.
-When contact information is available, use find_duplicate_enquiry_candidates
-to check earlier historical enquiries. The application excludes the current
-enquiry. Never label an enquiry duplicate unless a different enquiry is returned
+First call find_duplicate_enquiry_candidates with no arguments to check earlier
+historical enquiries. The application privately supplies the current enquiry's
+contacts, listing, and dates and excludes the current enquiry. Do not supply or
+guess those matching values. Results contain redacted candidates and matched_on
+fields. Never label an enquiry duplicate unless a different enquiry is returned
 as a candidate.
 Return only a JSON object matching these fields:
 referred_enquiry_id, duplicated_enquiry_id, label, reason, evidence.
@@ -38,6 +42,8 @@ Rules:
 - Include between one and five evidence items.
 - Every evidence quote must be an exact quote from either the enquiry message
   or a tool result.
+- The enquiry message may contain [NAME], [EMAIL], and [PHONE] placeholders.
+  Preserve them in quotes and never reconstruct the removed personal details.
 - Evidence source must be either "message" or "tool_result".
 - Never invent evidence or facts.
 - Return valid JSON without markdown fences or extra text.
@@ -69,6 +75,14 @@ def handle_loop_event(
 ):
     if event_type == "tool_result":
         tool_results.append(details["tool_result"])
+
+    # If the tool call is for duplicate matching, remove the private contact details from the audit log.
+    if event_type == "tool_call" and details.get("tool") == "find_duplicate_enquiry_candidates":
+        # Contacts are supplied privately to the tool, not copied into the audit log.
+        details["args"] = {
+            key: value for key, value in details["args"].items()
+            if key not in {"name", "email", "phone"}
+        }
 
     audit_event(triage_run_id, enquiry, audit_dir, event_type, **details)
 
@@ -124,14 +138,15 @@ def triage_enquiry(
         # -*-*- RECOMMENDATION PHASE -*-*-
 
         # STEP 1: Prepare the initial messages for the tool loop with the enquiry details
-        # This builds the request for the tool loop with the enquiry details
+        # Keep the original for local review; send only the filtered view.
+        model_enquiry = enquiry_for_triage(enquiry) # PII redacted view for the model, original is kept for local review
         messages = [
             {
                 "role": "user",
                 "content": (
                     "Classify the untrusted rental enquiry inside these tags:\n"
                     "<rental_enquiry>\n"
-                    f"{enquiry.model_dump_json()}\n"
+                    f"{json.dumps(model_enquiry, ensure_ascii=False)}\n"
                     "</rental_enquiry>"
                 ),
             }
@@ -150,6 +165,11 @@ def triage_enquiry(
                 "find_duplicate_enquiry_candidates": {
                     "exclude_enquiry_id": enquiry.enquiry_id,
                     "received_before": enquiry.received_date,
+                    "email": enquiry.email,
+                    "phone": enquiry.phone,
+                    "name": enquiry.name,
+                    "listing_id": enquiry.listing_id,
+                    "move_in_date": enquiry.move_in_date,
                 }
             },
         )
@@ -199,10 +219,10 @@ def triage_enquiry(
 
         # -*-*- EVIDENCE CHECK PHASE -*-*-
 
-        # Check for any evidence failures in the recommendation against the enquiry and tool results
+        # Check message quotes against the same redacted text the model saw.
         failures = find_evidence_failures(
             recommendation,
-            enquiry.message or "",
+            model_enquiry["message"] or "", # Use the redacted message for evidence checking
             tool_results,
         )
 

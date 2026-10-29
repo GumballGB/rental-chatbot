@@ -216,11 +216,15 @@ def test_search_listings_sorts_all_matches_before_limit():
     ] == expected_rents
 
 
-def test_get_enquiry_tool_returns_serialized_enquiry():
-    result = json.loads(get_enquiry(JsonStore(), "ENQ-001"))
+def test_get_enquiry_tool_returns_filtered_enquiry():
+    store = JsonStore()
+    original = store.get_enquiry("ENQ-001").model_dump()
+    result = json.loads(get_enquiry(store, "ENQ-001"))
 
     assert result["enquiry_id"] == "ENQ-001"
-    assert result["email"] == "alex.morgan@example.com"
+    assert {"name", "email", "phone"}.isdisjoint(result)
+    assert result["listing_id"] == original["listing_id"]
+    assert store.get_enquiry("ENQ-001").model_dump() == original
 
 
 def test_find_duplicate_candidates_tool_excludes_current_enquiry():

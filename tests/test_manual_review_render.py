@@ -88,6 +88,18 @@ def test_render_missing_optional_fields_uses_one_marker(item):
     assert "None" not in text
 
 
+def test_render_explains_redacted_evidence_and_keeps_the_original_message(item):
+    item.enquiry.message = "Call +1 514 555 0123 about the studio."
+    item.recommendation.evidence[0].quote = "Call [PHONE] about the studio."
+
+    text = render_review_item(item, 1, 1)
+
+    assert item.enquiry.message in text
+    assert item.recommendation.evidence[0].quote in text
+    assert "Evidence quotes use the redacted text seen by triage" in text
+    assert "original enquiry message is shown above" in text
+
+
 def test_render_duplicate_includes_the_original_enquiry_id(item):
 
     recommendation = Recommendation.model_validate({

@@ -2,6 +2,7 @@
 # that can be used in tests. It allows you to script responses and track calls made to the client.
 
 # fast way to make objects with attributes, like the real Anthropic responses
+from copy import deepcopy
 from types import SimpleNamespace
 
 # Production code uses the Anthropic client to interact with the model.
@@ -41,9 +42,14 @@ class FakeMessages:
         self._index = 0
 
     def create(self, **kwargs):
-        self.calls.append(kwargs)
+
+        # Record what was sent now, before the tool loop appends more messages.
+        self.calls.append(deepcopy(kwargs))
+
+        # Return the next scripted response, or raise an error if there are no more responses.
         if self._index >= len(self._responses):
             raise RuntimeError("FakeMessages has no scripted response left.")
+
         response = self._responses[self._index]
         self._index += 1
         return response

@@ -2,6 +2,7 @@
 
 import json
 
+from core.pii import enquiry_for_triage
 from core.store import JsonStore, NotFoundError
 
 ### MAIN TOOLS ###
@@ -184,17 +185,17 @@ SEARCH_LISTINGS_SCHEMA = {
 
 ### ENQUIRY TOOLS ###
 
-# generic enquiry retrieval tool for getting an enquiry
+# generic enquiry retrieval tool for getting an enquiry, PII redacted, therefore safe to return to the model
 def get_enquiry(store: JsonStore, enquiry_id: str) -> str:
     try:
-        return store.get_enquiry(enquiry_id).model_dump_json()
+        return json.dumps(enquiry_for_triage(store.get_enquiry(enquiry_id)), ensure_ascii=False)
     except NotFoundError as error:
         return json.dumps({"error": str(error)})
 
 
 GET_ENQUIRY_SCHEMA = {
     "name": "get_enquiry",
-    "description": "Retrieve one historical rental enquiry by its exact enquiry ID.",
+    "description": "Retrieve a filtered historical enquiry by its exact ID, with contact details removed and its message redacted.",
     "input_schema": {
         "type": "object",
         "properties": {
@@ -252,30 +253,27 @@ def find_duplicate_enquiry_candidates(
             "count": len(candidates),
             "candidates": [
                 {
-                    **enquiry.model_dump(mode="json"),
+                    **enquiry_for_triage(enquiry),  # Redact PII in the message and return only allowed fields
                     "matched_on": matched_on,
                 }
                 for enquiry, matched_on in candidates
             ],
-        }
+        },
+        ensure_ascii=False, 
     )
 
 
 FIND_DUPLICATE_ENQUIRY_CANDIDATES_SCHEMA = {
     "name": "find_duplicate_enquiry_candidates",
     "description": (
-        "Find historical enquiries that may duplicate the current enquiry. "
-        "Always exclude the enquiry currently being triaged."
+        "Check the current enquiry for historical duplicates. Call with no arguments: "
+        "the application privately supplies contacts, listing, dates, and the current enquiry ID. "
+        "Returns filtered candidates and matched_on fields without raw contact details."
     ),
     "input_schema": {
         "type": "object",
-        "properties": {
-            "email": {"type": "string"},
-            "phone": {"type": "string"},
-            "name": {"type": "string"},
-            "listing_id": {"type": "string"},
-            "move_in_date": {"type": "string"},
-        },
+        "properties": {},
+        "additionalProperties": False,
     },
 }
 
