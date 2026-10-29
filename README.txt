@@ -105,6 +105,30 @@ for displayed text; no keyboard or model calls are needed.
 
 -**-**- DATA GOVERNANCE -**-**-
 
+The chatbot collects details through a model-backed conversation. Use fictional
+users only in this demonstration. The triage redaction work does not anonymise
+the chatbot conversation or its extraction request.
+
+core/pii.py provides contains_pii, redact_pii, and enquiry_for_triage. These
+helpers recognise common emails, North American phones, Danish +45 phones,
+and local Danish numbers grouped as 12 34 56 78 (also dots/hyphens).
+Full known names ignore case. Individual name parts need at least four letters
+and the supplied capitalisation; accent-free spellings are accepted too.
+Danish ASCII alternatives include Sørensen/Sorensen and Kjær/Kjaer; ø/Ø map
+to o/O, and æ/Æ to ae/AE (also Ae). This does not identify unknown names.
+This preserves lowercase park for Nina Park, but can still redact Park at the
+start of a sentence. Lowercase partial signatures ("sofie here" for Sofie
+Andersen), short parts such as Kim, Lee, Jo, Li, or Bo, unknown names, and
+unsupported spellings can remain. Bare eight-digit numbers remain unchanged.
+Grouped numbers are redacted without a phone cue: "Units: 45 50 55 60 sqm"
+becomes "Units: [PHONE] sqm". We accept this false positive rather than miss
+uncued local phone numbers.
+
+this is not a complete PII detector.
+Other message text and the original Enquiry are preserved. The filtered view
+omits name, email, and phone fields.
+
+
 output/ contains full enquiry bodies, including names, email addresses, and
 phone numbers. Treat it as personal data. Git ignore prevents accidental
 tracking; it does not encrypt the files or restrict access to them. Keep these
