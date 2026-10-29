@@ -105,6 +105,9 @@ for displayed text; no keyboard or model calls are needed.
 
 -**-**- DATA GOVERNANCE -**-**-
 
+Evaluation planning: eval/eval_readme.txt.
+Design and privacy decisions: DECISIONS.txt.
+
 The chatbot collects details through a model-backed conversation. Use fictional
 users only in this demonstration. The triage redaction work does not anonymise
 the chatbot conversation or its extraction request.
