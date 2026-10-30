@@ -23,6 +23,7 @@ def test_run_tool_loop_plain_answer_no_tool_use():
     assert text == "Here is the answer."
     assert updated_messages[-1]["role"] == "assistant"
     assert client.messages.calls[0]["tools"] == af.CHATBOT_SCHEMA_LIST
+    assert client.messages.calls[0]["max_tokens"] == 1024
 
 
 def test_run_tool_loop_tool_use_then_end_turn():
@@ -62,13 +63,58 @@ def test_run_tool_loop_stops_after_six_iterations():
 
 
 def test_run_tool_loop_raises_on_unexpected_stop_reason():
-    bad_response = text_response("Partial", stop_reason="max_tokens")
+    bad_response = text_response("Partial", stop_reason="refusal")
     client = FakeAnthropicClient([bad_response])
     store = JsonStore()
     messages = [{"role": "user", "content": "hello"}]
 
-    with pytest.raises(RuntimeError, match="Unexpected tool response: max_tokens"):
+    with pytest.raises(RuntimeError, match="Unexpected tool response: refusal"):
         af.run_tool_loop(messages, client, store, "test system")
+
+
+def test_run_tool_loop_forwards_configured_output_limit_on_every_turn():
+    client = FakeAnthropicClient([
+        tool_use_response("get_listing", {"listing_id": "LST-001"}),
+        text_response("The listing lookup is complete."),
+    ])
+
+    af.run_tool_loop(
+        [{"role": "user", "content": "Check listing LST-001"}],
+        client, JsonStore(), "test system", max_tokens=3072,
+    )
+
+    assert len(client.messages.calls) == 2
+    assert all(call["max_tokens"] == 3072 for call in client.messages.calls)
+
+
+@pytest.mark.parametrize("max_tokens", [1024, 2048])
+def test_truncated_responses_raise_a_clear_error_without_retrying_or_accepting_partial_json(max_tokens):
+    client = FakeAnthropicClient([
+        text_response('{"label": "genuine"}', stop_reason="max_tokens", output_tokens=max_tokens),
+    ])
+    messages = [{"role": "user", "content": "Classify this enquiry."}]
+    events = []
+
+    with pytest.raises(RuntimeError, match=f"truncated.*max_tokens={max_tokens}"):
+        af.run_tool_loop(
+            messages, client, JsonStore(), "test system", max_tokens=max_tokens,
+            on_event=lambda event_type, **details: events.append((event_type, details)),
+        )
+
+    assert len(client.messages.calls) == 1
+    assert len(messages) == 1
+    assert events[0][0] == "model_call"
+    assert events[0][1]["tokens_out"] == max_tokens
+
+
+@pytest.mark.parametrize("max_tokens", [0, -1])
+def test_run_tool_loop_rejects_nonpositive_output_limits_before_calling_model(max_tokens):
+    client = FakeAnthropicClient([])
+
+    with pytest.raises(ValueError, match="max_tokens must be positive"):
+        af.run_tool_loop([], client, JsonStore(), "test system", max_tokens=max_tokens)
+
+    assert client.messages.calls == []
 
 
 def test_extract_unit_enquiry_accepts_fake_client():

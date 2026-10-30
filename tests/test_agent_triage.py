@@ -246,7 +246,7 @@ def test_triage_writes_run_finished_when_loop_fails(tmp_path):
         [text_response("partial", stop_reason="max_tokens")]
     )
 
-    with pytest.raises(RuntimeError, match="Unexpected tool response"):
+    with pytest.raises(RuntimeError, match="truncated.*max_tokens=2048"):
         triage_enquiry(
             make_enquiry(),
             client,
@@ -323,6 +323,18 @@ def successful_client():
             }],
         })),
     ])
+
+
+@pytest.mark.parametrize("max_tokens", [None, 3072])
+def test_triage_uses_larger_default_or_explicit_output_limit(tmp_path, max_tokens):
+    client = successful_client()
+    options = {} if max_tokens is None else {"max_tokens": max_tokens}
+
+    triage_enquiry(
+        make_enquiry(), client, JsonStore(), audit_dir=tmp_path, output_dir=None, **options,
+    )
+
+    assert client.messages.calls[0]["max_tokens"] == (max_tokens or 2048)
 
 
 def test_triage_sends_the_complete_recommendation_schema(tmp_path):

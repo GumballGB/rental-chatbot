@@ -68,13 +68,30 @@ before any model request. Without either option, all labelled enquiries run.
 The runner does not run automatically when imported. See the preparation
 checklist below before interpreting a live score.
 
+Triage now permits up to 2,048 output tokens per model call. This is a response
+ceiling, not the size of the conversation context. Override it when needed:
+
+    python -m eval.run_eval --ids ENQ-027,ENQ-058 --max-tokens 4096
+
+The limit applies to every model call in that triage run and is recorded as
+metadata.max_tokens in metrics.json. A max_tokens stop reason still fails the
+case with an explicit truncation error; partial JSON is not accepted and the
+runner does not retry automatically. A larger ceiling reduces the risk of
+truncation but does not guarantee completion. Raising the ceiling does not
+require the model to use all of it.
+
+The initial two 100-case runs used a 1,024-token ceiling. Their original reports
+remain preserved. Record each run's configuration and distinguish truncation
+failures from accepted but incorrect labels when comparing repeated runs.
+
 Every attempt creates a separate folder, so previous reports stay available:
 
     output/eval/<evaluation_id>/
         expected_answers.json  The answer-key rows scored in this attempt.
         predictions.json       Labels, duplicate targets, full recommendations,
                                successful triage run IDs, and failure reasons.
-        metrics.json           Scores plus model name, timestamps and data path.
+        metrics.json           Scores plus model name, output-token limit,
+                               timestamps and data path.
         report.txt             Human-readable confusion matrix and metrics.
         audit/0001/<run_id>.jsonl
         audit/0002/<run_id>.jsonl
@@ -98,6 +115,36 @@ Optional --data-dir and --output-dir arguments override the default folders;
 
 Tests use run_evaluation(client, data_dir=..., output_dir=..., show=...) with
 the fake client and tmp_path; no API key or live model call is required.
+
+*** REPEATED LIVE RUNS FOR REPORTING ***
+
+Complete the author review of the answer key and record its review date when
+that has actually happened. Full author review is currently pending. Then choose
+three or five full runs in advance and freeze the code, input rows, answer key,
+model and output-token ceiling for the series. Verify the committed state from
+a fresh checkout or the other machine before starting.
+
+Check the formerly truncated cases under the chosen ceiling first:
+
+    python -m eval.run_eval --ids ENQ-027,ENQ-058 --max-tokens 2048
+
+Keep that diagnostic separate. For each planned full run, use:
+
+    python -m eval.run_eval --max-tokens 2048
+
+Preserve every run, including failures, and record its evaluation ID, source
+revision (plus any uncommitted changes), data/answer-key hashes, dependency
+versions and configuration. Sampling parameters such as temperature are not
+explicitly set by the current client; describe them as provider defaults.
+If code or settings change, start a new series rather than pooling configurations.
+
+Report each run, mean and range, failures, per-class precision/recall and exact
+duplicate targets. Five runs are 500 predictions on 100 unique enquiries, not
+500 independent enquiry examples. These known synthetic cases informed development;
+repeated runs measure their consistency. Score chatbot extraction separately.
+
+Selected earlier reports and figures are archived in ../results/README.md.
+Their original scores and configuration remain documented there.
 
 *** PLOTTING A COMPLETED EVALUATION ***
 

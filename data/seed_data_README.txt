@@ -105,4 +105,4 @@ Python tests validate structure, coverage, completeness rules and duplicate
 reachability, not the semantic correctness of every proposed label.
 
 Evaluation commands are in eval/eval_readme.txt; design and privacy decisions
-are in DECISIONS.txt.
+are in DECISIONS.md.

@@ -165,6 +165,7 @@ def run_tool_loop(
     on_event=None,
     tool_schemas=CHATBOT_SCHEMA_LIST,
     bound_tool_arguments=None,
+    max_tokens: int = 1024,
 ):
     """
     Run the tool loop with the user, allowing the assistant to use tools to gather information.
@@ -177,11 +178,17 @@ def run_tool_loop(
         data_store (JsonStore): The data store containing listing information. (rental data).
         system (str): The system (instructions) prompt to guide the assistant's behavior.
         on_event (callable, optional): A callback function to capture events such as model calls and token usage.
+        max_tokens (int): Maximum output tokens per model call. Truncated
+            responses raise RuntimeError and are not accepted or retried.
 
     Returns:
         tuple: A tuple containing the assistant's response text (final answer) and the updated messages list.
         The updated message list is the conversation history including tool calls and result outputs.
     """
+
+    # Validate the max_tokens parameter to ensure it is positive
+    if max_tokens <= 0:
+        raise ValueError("max_tokens must be positive.")
 
     # Define a counter to track the number of iterations in the tool loop
     while_iter = 0
@@ -210,7 +217,7 @@ def run_tool_loop(
         # Prompt claude to enter the tool they want to use
         response = client.messages.create(
             model=MODEL,
-            max_tokens=1024,
+            max_tokens=max_tokens,
             system=system,
             tools=tool_schemas,
             messages=messages,
@@ -230,6 +237,13 @@ def run_tool_loop(
         # At this stage the tool/response reason is given, which means;
         # The Agent has indicated it wants to use a tool to gather information.
         # OR The agent triage system has indicated it wants to use a tool to gather information.
+
+        # It is possible to hit the max tokens
+        if response.stop_reason == "max_tokens":
+            raise RuntimeError(
+                f"Model response truncated at configured max_tokens={max_tokens}. "
+                "No complete response was accepted."
+            )
 
         # This responses indicated the agent is finished and has provided a final answer.
         if response.stop_reason == "end_turn":

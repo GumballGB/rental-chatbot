@@ -19,6 +19,8 @@ from models.event import Event
 from models.recommendation import Recommendation
 from models.triage_result import TriageResult
 
+DEFAULT_TRIAGE_MAX_TOKENS = 2048
+
 TRIAGE_SYSTEM_PROMPT = """
 You triage rental enquiries into one of these labels:
 genuine, needs_info, spam, or duplicate.
@@ -125,6 +127,8 @@ def triage_enquiry(
     data_store,
     audit_dir: str | Path = DEFAULT_AUDIT_DIR,
     output_dir: str | Path | None = DEFAULT_OUTPUT_DIR,
+    *,
+    max_tokens: int = DEFAULT_TRIAGE_MAX_TOKENS,
 ) -> TriageResult:
     """
     Triage a rental enquiry into a recommendation. This function runs a tool loop to gather 
@@ -140,6 +144,7 @@ def triage_enquiry(
         audit_dir (str | Path, optional): Directory to store audit logs. Defaults to DEFAULT_AUDIT_DIR.
         output_dir: Directory for the enquiry, recommendation, and pending review.
             None skips these saves; audit logging still uses audit_dir.
+        max_tokens: Maximum output tokens per model call, default 2048.
 
     Returns:
         TriageResult: The run ID and validated recommendation for the triage decision.
@@ -192,6 +197,7 @@ def triage_enquiry(
             system=TRIAGE_SYSTEM_PROMPT,
             on_event=loop_event_handler,
             tool_schemas=TRIAGE_SCHEMA_LIST,
+            max_tokens=max_tokens,
             bound_tool_arguments={
                 "find_duplicate_enquiry_candidates": {
                     "exclude_enquiry_id": enquiry.enquiry_id,

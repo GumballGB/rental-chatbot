@@ -1,0 +1,26 @@
+Label accuracy: 96/100 (96.0%)
+
+Confusion matrix (rows=expected, columns=predicted)
+Expected    genuine  needs_info  spam  duplicate  no recommendation
+genuine     27       0           0     1          0
+needs_info  0        22          0     1          1
+spam        0        0           24    0          0
+duplicate   0        0           0     23         1
+
+Per-class metrics
+Label       Support  Predicted  Precision  Recall
+genuine     28       27         100.0%     96.4%
+needs_info  24       22         100.0%     91.7%
+spam        24       24         100.0%     100.0%
+duplicate   24       25         92.0%      95.8%
+
+Duplicate exact outcomes: 23/24 (95.8%)
+
+Failed runs: 2/100
+
+ENQ-027: RuntimeError: Unexpected tool response: max_tokens
+ENQ-058: RuntimeError: Unexpected tool response: max_tokens
+
+---
+
+

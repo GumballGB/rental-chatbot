@@ -78,6 +78,8 @@ def test_evaluation_records_success_failure_and_continues_without_creating_revie
     assert metrics["failed"] == 1
     assert metrics["accuracy"] == pytest.approx(2 / 3)
     assert metrics["metadata"]["model"]
+    assert metrics["metadata"]["max_tokens"] == 2048
+    assert all(call["max_tokens"] == 2048 for call in client.messages.calls)
     assert read_json(run_dir / "expected_answers.json") == read_json(
         eval_data / "enquiry_recommendation_ground_truth.json"
     )
@@ -151,6 +153,39 @@ def test_ids_and_limit_cannot_be_combined(eval_data, tmp_path):
     assert not (tmp_path / "eval").exists()
 
 
+@pytest.mark.parametrize("max_tokens", [0, -1])
+def test_nonpositive_output_limit_fails_before_requests_or_output_writes(eval_data, tmp_path, max_tokens):
+    client = FakeAnthropicClient([])
+
+    with pytest.raises(ValueError, match="max_tokens must be positive"):
+        run_evaluation(client, eval_data, tmp_path / "eval", max_tokens=max_tokens)
+
+    assert client.messages.calls == []
+    assert not (tmp_path / "eval").exists()
+
+
+def test_truncation_remains_a_failed_case_and_evaluation_continues(eval_data, tmp_path):
+    truncated = recommendation_response("ENQ-001")
+    truncated.stop_reason = "max_tokens"
+    truncated.usage.output_tokens = 2048
+    client = FakeAnthropicClient([
+        truncated, recommendation_response("ENQ-002", "needs_info"),
+        recommendation_response("ENQ-003", "spam"),
+    ])
+
+    run_dir = run_evaluation(client, eval_data, tmp_path / "eval", show=lambda _: None)
+
+    predictions = read_json(run_dir / "predictions.json")
+    assert predictions[0]["predicted_label"] is None
+    assert "truncated" in predictions[0]["error"]
+    assert "max_tokens=2048" in predictions[0]["error"]
+    metrics = read_json(run_dir / "metrics.json")
+    assert metrics["total"] == 3
+    assert metrics["correct"] == 2
+    assert metrics["failed"] == 1
+    assert len(client.messages.calls) == 3
+
+
 def test_repeated_evaluations_keep_previous_outputs(eval_data, tmp_path):
     def run_once():
         client = FakeAnthropicClient([recommendation_response("ENQ-001")])
@@ -208,11 +243,16 @@ def test_cli_uses_given_directories_and_limit(eval_data, tmp_path, monkeypatch):
     monkeypatch.setattr("eval.run_eval.boot_anthropic", lambda: client)
     monkeypatch.setattr("eval.run_eval.load_dotenv", lambda: None)
 
-    main(["--data-dir", str(eval_data), "--output-dir", str(tmp_path / "eval"), "--limit", "1"])
+    main([
+        "--data-dir", str(eval_data), "--output-dir", str(tmp_path / "eval"),
+        "--limit", "1", "--max-tokens", "3072",
+    ])
 
     reports = list((tmp_path / "eval").glob("*/report.txt"))
     assert len(reports) == 1
     assert "Label accuracy: 1/1" in reports[0].read_text(encoding="utf-8")
+    assert read_json(reports[0].with_name("metrics.json"))["metadata"]["max_tokens"] == 3072
+    assert client.messages.calls[0]["max_tokens"] == 3072
 
 
 def test_cli_accepts_comma_separated_ids_and_trims_spaces(eval_data, tmp_path, monkeypatch):
@@ -234,6 +274,7 @@ def test_cli_accepts_comma_separated_ids_and_trims_spaces(eval_data, tmp_path, m
 @pytest.mark.parametrize("selection", [
     ["--ids", ""], ["--ids", "ENQ-001,,ENQ-003"],
     ["--limit", "1", "--ids", "ENQ-001"],
+    ["--max-tokens", "0"], ["--max-tokens", "-1"],
 ])
 def test_invalid_cli_selection_exits_before_creating_a_client(selection, monkeypatch):
     def unexpected_client():

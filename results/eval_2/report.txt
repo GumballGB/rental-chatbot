@@ -1,0 +1,27 @@
+Label accuracy: 99/100 (99.0%)
+
+Confusion matrix (rows=expected, columns=predicted)
+Expected    genuine  needs_info  spam  duplicate  no recommendation
+genuine     28       0           0     0          0
+needs_info  0        23          0     1          0
+spam        0        0           24    0          0
+duplicate   0        0           0     24         0
+
+Per-class metrics
+Label       Support  Predicted  Precision  Recall
+genuine     28       28         100.0%     100.0%
+needs_info  24       23         100.0%     95.8%
+spam        24       24         100.0%     100.0%
+duplicate   24       25         96.0%      100.0%
+
+Duplicate exact outcomes: 24/24 (100.0%)
+
+Failed runs: 0/100
+
+---
+
+Second evaluation. The first evaluation with 100 unit enquiries
+
+"model": "claude-haiku-5-5",
+"started_at": "2026-10-30T16:22:36.559635+00:00",
+"finished_at": "2026-10-30T16:30:08.299350+00:00",

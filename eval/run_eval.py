@@ -9,7 +9,7 @@ from uuid import uuid4
 from anthropic import AnthropicError
 from dotenv import load_dotenv
 
-from agents.agent_triage import triage_enquiry
+from agents.agent_triage import DEFAULT_TRIAGE_MAX_TOKENS, triage_enquiry
 from agents.anthropic_functions import MODEL, boot_anthropic
 from core.store import DATA_DIR, JsonStore
 from core.writer import DEFAULT_OUTPUT_DIR
@@ -34,6 +34,7 @@ def run_evaluation(
     *,
     limit: int | None = None,
     ids: list[str] | None = None,
+    max_tokens: int = DEFAULT_TRIAGE_MAX_TOKENS,
     show=print,
 ) -> Path:
     """
@@ -49,11 +50,15 @@ def run_evaluation(
     next case continues. Filesystem errors and keyboard interrupts propagate.
     Completed predictions are saved after each case. Evaluation creates no
     pending reviews; its audit logs live inside this evaluation's own folder.
+    max_tokens sets each triage model call's output limit and is recorded in
+    report metadata. Truncated responses remain failed cases without retries.
     """
 
     # Guard the limit argument before loading the answer key, to avoid wasting API calls or creating output files.
     if limit is not None and limit <= 0:
         raise ValueError("limit must be positive.")
+    if max_tokens <= 0:
+        raise ValueError("max_tokens must be positive.")
     if ids is not None:
         if limit is not None:
             raise ValueError("ids and limit cannot be combined.")
@@ -111,7 +116,7 @@ def run_evaluation(
         try:
             result = triage_enquiry(
                 store.get_enquiry(enquiry_id), client, store,
-                audit_dir=run_dir / audit_path, output_dir=None,
+                audit_dir=run_dir / audit_path, output_dir=None, max_tokens=max_tokens,
             )
         except (ValueError, RuntimeError, AnthropicError) as error:
             prediction["error"] = f"{type(error).__name__}: {error}"
@@ -135,6 +140,7 @@ def run_evaluation(
     # Save the metrics and report to the run folder, and show a summary to the user.
     metrics["metadata"] = {
         "model": MODEL,
+        "max_tokens": max_tokens,
         "started_at": started_at,
         "finished_at": datetime.now(UTC).isoformat(),
         "data_dir": str(data_dir.resolve()),
@@ -164,6 +170,10 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Evaluate triage on fictional enquiries.")
     parser.add_argument("--data-dir", type=Path, default=Path(DATA_DIR))
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_EVAL_DIR)
+    parser.add_argument(
+        "--max-tokens", type=int, default=DEFAULT_TRIAGE_MAX_TOKENS,
+        help=f"Maximum output tokens per triage model call (default: {DEFAULT_TRIAGE_MAX_TOKENS}).",
+    )
     selection = parser.add_mutually_exclusive_group()
     selection.add_argument("--limit", type=int, help="Evaluate only the first N answer-key cases.")
     selection.add_argument("--ids", type=_parse_ids, help="Comma-separated enquiry IDs, in evaluation order.")
@@ -172,6 +182,8 @@ def main(argv: list[str] | None = None) -> None:
     # Guard the limit argument before loading the answer key, to avoid wasting API calls or creating output files.
     if args.limit is not None and args.limit <= 0:
         parser.error("--limit must be positive")
+    if args.max_tokens <= 0:
+        parser.error("--max-tokens must be positive")
 
     # Load ANTHROPIC key
     load_dotenv()
@@ -179,7 +191,7 @@ def main(argv: list[str] | None = None) -> None:
     # Run the evaluation with the real client, saving results to a new folder under output/eval/.
     run_evaluation(
         boot_anthropic(), data_dir=args.data_dir, output_dir=args.output_dir,
-        limit=args.limit, ids=args.ids,
+        limit=args.limit, ids=args.ids, max_tokens=args.max_tokens,
     )
 
 

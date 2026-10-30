@@ -1,3 +1,6 @@
+import sys
+
+
 def choose_language():
     print("Please choose a language:\n")
     print("1. English")
@@ -32,7 +35,7 @@ def display_header():
         display_danish_header()
     elif choice == "4":
         print("Exiting the program.")
-        exit()
+        sys.exit()
     else:
         print("Invalid choice. Please try again.")
         display_header()

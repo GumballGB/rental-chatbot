@@ -4,6 +4,7 @@ from models.enquiry import Enquiry
 from models.recommendation import Recommendation
 from models.review import Review
 
+
 class ReviewLoadError(ValueError):
     """A review item has a missing, unreadable, invalid, or mismatched file."""
 
