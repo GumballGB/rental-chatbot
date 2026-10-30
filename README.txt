@@ -105,7 +105,7 @@ for displayed text; no keyboard or model calls are needed.
 
 -**-**- DATA GOVERNANCE -**-**-
 
-Evaluation planning: eval/eval_readme.txt.
+Evaluation commands, preparation and report layout: eval/eval_readme.txt.
 Design and privacy decisions: DECISIONS.txt.
 
 The chatbot collects details through a model-backed conversation. Use fictional
@@ -130,6 +130,9 @@ uncued local phone numbers.
 this is not a complete PII detector.
 Other message text and the original Enquiry are preserved. The filtered view
 omits name, email, and phone fields.
+It includes application-computed has_name and has_contact booleans so triage
+can apply the name AND (email OR phone) completeness rule without seeing the
+values. Blank fields count as absent; missing rental preferences are allowed.
 
 triage_enquiry now uses this filtered view for its initial model request and
 checks message evidence against the same redacted text. The original enquiry

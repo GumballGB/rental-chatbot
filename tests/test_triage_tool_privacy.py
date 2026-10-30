@@ -96,6 +96,8 @@ def test_duplicate_lookup_uses_bound_contacts_and_filters_every_tool_turn(
     retrieved = json.loads(client.messages.calls[2]["messages"][-1]["content"][0]["content"])
     for view in (candidate, retrieved):
         assert {"name", "email", "phone"}.isdisjoint(view)
+        assert view["has_name"] is True
+        assert view["has_contact"] is True
         assert "[NAME]" in view["message"]
         assert "[EMAIL]" in view["message"]
         assert "[PHONE]" in view["message"]

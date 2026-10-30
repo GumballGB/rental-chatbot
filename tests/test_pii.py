@@ -1,4 +1,4 @@
-"""Redaction recognises supported contacts while preserving rental information."""
+# Redaction recognises supported contacts while preserving rental information.
 
 import pytest
 
@@ -209,6 +209,8 @@ def test_model_facing_view_has_only_allowed_fields_and_preserves_the_original():
         "budget_currency": "CAD",
         "received_date": "2026-10-29",
         "move_in_date": "2026-12-01",
+        "has_name": True,
+        "has_contact": True,
         "message": "[NAME] here. Email [EMAIL] or call [PHONE].",
     }
     assert enquiry.model_dump() == before
@@ -224,3 +226,30 @@ def test_model_facing_view_handles_optional_fields_and_zero_budget():
     assert "name" not in view
     assert "email" not in view
     assert "phone" not in view
+
+
+@pytest.mark.parametrize(("name", "email", "phone", "has_name", "has_contact"), [
+    ("Amélie", "amelie@example.com", None, True, True),
+    ("Amélie", None, "+1 514 555 0123", True, True),
+    (None, "amelie@example.com", "+1 514 555 0123", False, True),
+    ("Amélie", None, None, True, False),
+    (None, None, None, False, False),
+    ("", None, "", False, False),
+    (" \t ", None, " \t ", False, False),
+    (" Amélie ", None, " +1 514 555 0123 ", True, True),
+])
+def test_presence_flags_use_nonblank_fields_without_inferring_from_the_message(
+    name, email, phone, has_name, has_contact,
+):
+    enquiry = Enquiry(
+        enquiry_id="ENQ-flags", name=name, email=email, phone=phone,
+        message="Hi, I'm Amélie. Email amelie@example.com or call +1 514 555 0123.",
+    )
+    original = enquiry.model_dump()
+
+    view = enquiry_for_triage(enquiry)
+
+    assert view["has_name"] is has_name
+    assert view["has_contact"] is has_contact
+    assert {"name", "email", "phone"}.isdisjoint(view)
+    assert enquiry.model_dump() == original

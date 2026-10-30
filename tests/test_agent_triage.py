@@ -338,6 +338,38 @@ def test_triage_can_skip_output_saving(tmp_path, monkeypatch):
     assert {path.name for path in tmp_path.iterdir()} == {f"{result.run_id}.jsonl"}
 
 
+@pytest.mark.parametrize(("name", "email", "phone", "has_name", "has_contact"), [
+    ("Amélie Tremblay", "amelie@example.com", None, True, True),
+    ("Amélie Tremblay", None, "+1 514 555 0123", True, True),
+    (None, "amelie@example.com", "+1 514 555 0123", False, True),
+    ("Amélie Tremblay", None, None, True, False),
+    (None, None, None, False, False),
+])
+def test_triage_sends_presence_flags_and_label_policy_without_contact_values(
+    tmp_path, name, email, phone, has_name, has_contact,
+):
+    enquiry = make_enquiry().model_copy(update={"name": name, "email": email, "phone": phone})
+    client = successful_client()
+
+    triage_enquiry(enquiry, client, JsonStore(), audit_dir=tmp_path, output_dir=None)
+
+    request = client.messages.calls[0]
+    content = request["messages"][0]["content"]
+    payload = json.loads(content.split("<rental_enquiry>\n", 1)[1].split("\n</rental_enquiry>", 1)[0])
+    assert payload["has_name"] is has_name
+    assert payload["has_contact"] is has_contact
+    for private_value in (name, email, phone):
+        if private_value:
+            assert private_value not in json.dumps(request, ensure_ascii=False)
+    policy = request["system"]
+    for label in ("genuine", "needs_info", "spam", "duplicate"):
+        assert f"{label}:" in policy
+    assert "both has_name and has_contact are true" in policy
+    assert "either has_name or has_contact is false" in policy
+    assert "Missing listing, move-in date, budget or currency" in policy
+    assert "application-computed" in policy
+
+
 def test_triage_audits_saving_failure(tmp_path, monkeypatch):
     def failed_save(*args, **kwargs):
         raise OSError("Disk full")

@@ -99,8 +99,13 @@ def redact_pii(text: str, name: str | None = None) -> str:
     return _pii_pattern(name).sub(lambda match: f"[{match.lastgroup}]", text)
 
 
-def enquiry_for_triage(enquiry: Enquiry) -> dict[str, str | int | None]:
-    """Return only allowed fields with redacted text; leave the original intact."""
+def enquiry_for_triage(enquiry: Enquiry) -> dict[str, str | int | bool | None]:
+    """Return redacted rental fields and contact-presence flags, not contacts.
+
+    Presence means a nonblank structured field. Details mentioned only in the
+    message do not count; extraction belongs to the chatbot. Leave the original
+    enquiry intact for the human reviewer.
+    """
 
     fields = {
         "enquiry_id": enquiry.enquiry_id,
@@ -109,6 +114,10 @@ def enquiry_for_triage(enquiry: Enquiry) -> dict[str, str | int | None]:
         "budget_currency": enquiry.budget_currency,
         "received_date": enquiry.received_date,
         "move_in_date": enquiry.move_in_date,
+        "has_name": bool(enquiry.name and enquiry.name.strip()),
+        "has_contact": any(
+            value and value.strip() for value in (enquiry.email, enquiry.phone)
+        ),
         "message": (
             redact_pii(enquiry.message, name=enquiry.name)
             if enquiry.message is not None else None
