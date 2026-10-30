@@ -1,0 +1,40 @@
+# Runs the lint check and the automated tests on every push to main and on every pull request.
+# The tests use fake clients, so no API key is needed and no model is ever called here.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# The workflow only needs to read the repository.
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # Download the repository's committed files onto the fresh machine.
+      - uses: actions/checkout@v4
+
+      # Install Python 3.12 (the version the project is developed with) and cache downloaded packages.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Lint with ruff
+        run: ruff check .
+
+      - name: Run tests
+        run: python -m pytest
