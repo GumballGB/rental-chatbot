@@ -154,13 +154,8 @@ prompt or that the heuristic catches all PII.
 Human review retains the original enquiry and displays a note explaining that
 evidence quotes use the redacted text seen by triage.
 
-
 output/ contains full enquiry bodies, including names, email addresses, and
 phone numbers. Treat it as personal data. Git ignore prevents accidental
 tracking; it does not encrypt the files or restrict access to them. Keep these
 runtime files out of source control and restrict access when sharing or backing
 up the project.
-
-
-
-

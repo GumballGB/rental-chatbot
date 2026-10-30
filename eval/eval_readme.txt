@@ -3,10 +3,11 @@
 This package evaluates the agent's recommendations before human review,
 separately from chatbot extraction quality. metrics.py calculates the scores,
 report.py renders the text, and run_eval.py runs triage and saves the results.
+plot.py exports saved metrics as heatmaps.
 
 *** INPUTS ***
 
-- ../data/unit_enquiries.json: the 47 fictional enquiries.
+- ../data/unit_enquiries.json: the 100 fictional enquiries.
 - ../data/enquiry_recommendation_ground_truth.json: proposed expected labels,
   duplicate targets, and rationales. Human review of the answer key is pending.
 
@@ -36,6 +37,14 @@ Columns (predicted): genuine, needs_info, spam, duplicate, no recommendation.
   outcomes in that second count too.
 - Report run failures explicitly. Do not score the final human-corrected Review
   as though it were the agent's original recommendation.
+
+Evidence validation permits an initial-letter capitalization difference in a
+message quote, alongside the existing Unicode, whitespace and typographic-quote
+normalization. Other case changes and all tool-result case changes still fail.
+This comparison rule changed after the initial 47-case run rejected ENQ-019
+for quoting Jeg instead of jeg. That original 46/47 report stays unchanged;
+future evaluations use the updated rule. Keep validation-policy changes in
+mind when comparing reports, and use fresh cases after tuning on known errors.
 
 *** RUNNING THE EVALUATION ***
 
@@ -90,17 +99,76 @@ Optional --data-dir and --output-dir arguments override the default folders;
 Tests use run_evaluation(client, data_dir=..., output_dir=..., show=...) with
 the fake client and tmp_path; no API key or live model call is required.
 
+*** PLOTTING A COMPLETED EVALUATION ***
+
+plot.py uses Matplotlib to render the saved confusion matrix. Install the
+updated requirements-dev.txt, then replace <evaluation_id> with the folder
+printed by the evaluation command:
+
+    python -m eval.plot output/eval/<evaluation_id>/metrics.json
+
+This saves confusion_matrix.png beside metrics.json. It only reads the saved
+metrics; it does not call the model or change predictions. Wait for the current
+evaluation to finish so that metrics.json exists.
+
+For percentages within each expected class:
+
+    python -m eval.plot output/eval/<evaluation_id>/metrics.json --normalize
+
+This saves confusion_matrix_normalized.png. Row denominators include failed
+runs, and n/a means that no examples of that class were evaluated. Both views
+show each class's support (n) and keep the no recommendation column.
+
+Use --output to choose a filename or export a vector figure for the paper:
+
+    python -m eval.plot output/eval/<evaluation_id>/metrics.json --output output/eval/matrix.pdf
+
+PNG, PDF and SVG are supported. From Python, plot_confusion_matrix(report)
+returns a Matplotlib Figure, which can be exported using figure.savefig(...).
+Charts report label classification; duplicate-target accuracy remains a separate
+metric in metrics.json and report.txt.
+
+No precision-recall or ROC curve is generated. Current predictions contain
+labels, not numerical scores that can be thresholded. A confusion matrix does
+not contain enough information to recover such a curve. If appropriate scores
+are available in a future evaluation, a per-class curve can be added separately.
+Do not invent scores or treat label IDs as confidence values.
+
+Reference: Matplotlib annotated heatmaps
+https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
+Reference: scikit-learn precision_recall_curve (requires prediction scores)
+https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_curve.html
+
 *** DATASET LIMITATIONS AND PREPARATION ***
 
-The current proposed labels are 22 genuine, 9 needs_info, 8 spam, and 8 duplicate.
-Always predicting genuine would score 22/47 (46.8%) accuracy. This is still an
-imbalanced evaluation set, not model training data; class counts and per-class
-metrics are necessary to interpret results. The needs_info examples now cover
-missing names even when both contacts are supplied, named renters with no
-contact method, and neither name nor contact details. ENQ-046 is a genuine
-phone-only lead; ENQ-047 needs a name despite supplying email and phone.
-With eight examples in a class, one error changes recall by 12.5 percentage
-points, so results remain a small synthetic evaluation.
+The 100 proposed labels are 28 genuine, 24 needs_info, 24 spam, and 24 duplicate.
+Always predicting genuine would score 28/100 (28.0%) accuracy. Class counts and
+per-class metrics remain necessary: one error among 24 examples changes recall
+by about 4.2 percentage points. This is synthetic evaluation data, not training
+data or a representative sample of real enquiries.
+
+The original ENQ-001..ENQ-047 retain their exact inputs and answers: 22 genuine,
+9 needs_info, 8 spam, 8 duplicate. ENQ-048..ENQ-100 add 53 challenge cases:
+6 genuine, 15 needs_info, 16 spam and 16 duplicate. The additions cover shared
+contacts for different requests, weak duplicate candidates, quoted or negated
+spam vocabulary, forged roles and flags, incomplete structured fields, and
+cross-language or reformatted follow-ups. Details are in data/seed_data_README.txt.
+The new labels are proposed answers for human review, not conclusions from a
+live model run.
+
+All additions are dated 2026-10-30, after the original received dates. They
+leave the original earlier-enquiry context intact, and same-day new cases are
+excluded from each other's duplicate context. New duplicate targets are earlier
+original enquiries; the difficult multi-candidate case must select the right
+request rather than just a matching contact.
+
+The normal command now evaluates all 100. --limit 47 selects the original cohort.
+From Python, run_evaluation(client, ids=[f"ENQ-{n:03d}" for n in range(48, 101)])
+selects only the added cohort with the same full read-only store. Keep original,
+new-cohort and combined results distinct when reporting; the known cases were
+used during prompt and guard development. Cohort metrics can also be calculated
+from saved predictions and answer rows without repeating model calls.
+The previous 46/47 result and frozen artifacts have not been rescored or changed.
 
 Triage now receives application-computed has_name and has_contact booleans.
 A field is present only if it is nonblank; contact means email OR phone.

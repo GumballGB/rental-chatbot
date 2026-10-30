@@ -2,6 +2,8 @@
 
 import json
 
+import pytest
+
 from core.evidence import find_evidence_failures, recommendation_passes_evidence_check
 from models.recommendation import Recommendation
 
@@ -112,7 +114,7 @@ def test_evidence_checker_tolerates_curly_apostrophe_differences():
     assert find_evidence_failures(rec, enquiry_message, []) == []
 
 
-def test_evidence_checker_is_case_sensitive():
+def test_evidence_checker_still_rejects_case_changes_beyond_the_initial_letter():
     rec = make_recommendation(
         [
             {
@@ -127,6 +129,68 @@ def test_evidence_checker_is_case_sensitive():
 
     assert len(failures) == 1
     assert failures[0].reason == "not found in message"
+
+
+@pytest.mark.parametrize(("quote", "message"), [
+    ("Jeg søger en lejlighed i København.", "Hej, jeg søger en lejlighed i København."),
+    ("jeg søger en lejlighed i København.", "Jeg søger en lejlighed i København."),
+    ("Écrivez-moi demain.", "Pour visiter: écrivez-moi demain."),
+    ("I'm looking for a studio.", "Hello! i’m looking for a studio."),
+])
+def test_message_quotes_allow_initial_letter_capitalization_without_changing_evidence(quote, message):
+    recommendation = make_recommendation([{
+        "source": "message", "quote": quote, "support": "States a rental-related request.",
+    }])
+    original = recommendation.model_dump()
+
+    assert find_evidence_failures(recommendation, message, []) == []
+    assert recommendation.model_dump() == original
+
+
+@pytest.mark.parametrize(("quote", "message"), [
+    ("My budget is 2900 CAD.", "My budget is 1900 CAD."),
+    ("Pets are allowed.", "Pets are not allowed."),
+    ("Jeg søger en lejlighed i Aarhus.", "Hej, jeg søger en lejlighed i København."),
+    ("Jeg søger en Lejlighed.", "Hej, jeg søger en lejlighed."),
+    ("Contact us tomorrow.", "Contact US tomorrow."),
+    ("Looking for a (studio).", "looking for a studio."),
+    ("Studio.* please", "studio near downtown please"),
+])
+def test_initial_letter_tolerance_rejects_other_text_changes(quote, message):
+    recommendation = make_recommendation([{
+        "source": "message", "quote": quote, "support": "An altered quote must fail.",
+    }])
+
+    failures = find_evidence_failures(recommendation, message, [])
+
+    assert len(failures) == 1
+    assert failures[0].reason == "not found in message"
+
+
+@pytest.mark.parametrize(("quote", "tool_result"), [
+    ('"listing_id": "lst-001"', '{"listing_id": "LST-001"}'),
+    ("Available listing", "available listing"),
+])
+def test_tool_result_identifiers_and_text_remain_case_sensitive(quote, tool_result):
+    recommendation = make_recommendation([{
+        "source": "tool_result", "quote": quote, "support": "References a listing identifier or status.",
+    }])
+
+    failures = find_evidence_failures(recommendation, "", [tool_result])
+
+    assert len(failures) == 1
+    assert failures[0].reason == "not found in tool results"
+
+
+@pytest.mark.parametrize("source", ["message", "tool_result"])
+def test_capitalization_tolerance_does_not_allow_quotes_from_the_wrong_source(source):
+    recommendation = make_recommendation([{
+        "source": source, "quote": "Jeg søger en lejlighed.", "support": "Requires its declared source.",
+    }])
+    message = "Unrelated message." if source == "message" else "Jeg søger en lejlighed."
+    tools = ["Jeg søger en lejlighed."] if source == "message" else ["Unrelated tool result."]
+
+    assert len(find_evidence_failures(recommendation, message, tools)) == 1
 
 
 def test_evidence_checker_does_not_relax_message_punctuation_spacing():

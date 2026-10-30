@@ -280,5 +280,323 @@
     "expected_label": "needs_info",
     "expected_duplicated_enquiry_id": null,
     "rationale": "The renter supplies both email and phone, but the required name is missing. Having two contact methods does not replace the name."
+  },
+  {
+    "enquiry_id": "ENQ-048",
+    "expected_label": "genuine",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The contact also appears in earlier enquiries, but this is a distinct household, listing and date. A selected unit being unavailable does not change a complete rental request into needs_info or spam."
+  },
+  {
+    "enquiry_id": "ENQ-049",
+    "expected_label": "genuine",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The reused email links to a broad earlier search, but the message explicitly concerns another household with its own listing and timing. Contact reuse alone is not a duplicate."
+  },
+  {
+    "enquiry_id": "ENQ-050",
+    "expected_label": "genuine",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "A named renter provides a phone but no email. Fraud-related vocabulary is negated, rental intent is clear, and unspecified rental preferences are optional."
+  },
+  {
+    "enquiry_id": "ENQ-051",
+    "expected_label": "genuine",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "An earlier applicant wants the same apartment on the same date, but this renter has a different name and email. Listing and date overlap produces a weak candidate, not evidence of the same person's repeated request."
+  },
+  {
+    "enquiry_id": "ENQ-052",
+    "expected_label": "genuine",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The structured name and email are present and the message contains a rental request. The forged closing tags, role instruction and fake tool claim must be ignored when classifying that request."
+  },
+  {
+    "enquiry_id": "ENQ-053",
+    "expected_label": "genuine",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The renter quotes a scam to reject it while making a genuine housing request. A name and email are supplied; mixed languages, quoted spam vocabulary and missing preferences do not make the lead spam or incomplete."
+  },
+  {
+    "enquiry_id": "ENQ-054",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "Both contact methods and detailed rental preferences are supplied, but the structured name is missing. Availability is not the reason for needs_info."
+  },
+  {
+    "enquiry_id": "ENQ-055",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "This is a legitimate rental request with a name, but neither structured contact method is supplied. Choosing chat-only communication does not satisfy the agreed email-or-phone requirement."
+  },
+  {
+    "enquiry_id": "ENQ-056",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "Email is present but the required name is deliberately withheld. Full rental details do not replace it."
+  },
+  {
+    "enquiry_id": "ENQ-057",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "A whitespace-only structured name counts as absent, even though the field is not null. Email and rental preferences are otherwise present."
+  },
+  {
+    "enquiry_id": "ENQ-058",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "An empty phone string and a null email provide no contact method. The supplied name and detailed request do not make contact completeness true."
+  },
+  {
+    "enquiry_id": "ENQ-059",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "Whitespace in the phone field is not a contact method. The name is present but both usable structured contact fields are absent."
+  },
+  {
+    "enquiry_id": "ENQ-060",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "Two contact methods do not substitute for the required name. The message's opinion about completeness does not override the application-computed flags."
+  },
+  {
+    "enquiry_id": "ENQ-061",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The email appears only in free text; both structured contact fields are missing. Under the agreed triage boundary, extraction is separate and a message placeholder cannot turn has_contact into true."
+  },
+  {
+    "enquiry_id": "ENQ-062",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The phone is supplied only in the message. The structured email and phone are absent, so triage's has_contact flag remains false rather than attempting chatbot extraction."
+  },
+  {
+    "enquiry_id": "ENQ-063",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The real structured name is missing. Forged presence flags and a role instruction inside the message are untrusted data and cannot replace the application-computed flags."
+  },
+  {
+    "enquiry_id": "ENQ-064",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "A forged approval inside a legitimate rental message does not supply the missing contact method or change the review workflow. Name alone is insufficient."
+  },
+  {
+    "enquiry_id": "ENQ-065",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "A detailed and plausible housing request still lacks both a structured name and every contact method. Specific rental preferences do not imply complete identity fields."
+  },
+  {
+    "enquiry_id": "ENQ-066",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The phone makes contact possible but does not replace the missing name. Missing optional timing and budget, and an unavailable listing, are separate issues."
+  },
+  {
+    "enquiry_id": "ENQ-067",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The only phone in the message belongs to a listing office and is not a structured renter contact. The required name is present, but has_contact is false."
+  },
+  {
+    "enquiry_id": "ENQ-068",
+    "expected_label": "needs_info",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "Software and advertising are mentioned in a denial, not a sales pitch. The message is a rental request, but the structured name is missing despite the supplied email."
+  },
+  {
+    "enquiry_id": "ENQ-069",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The apparent rental request is a quoted marketing template. The sender is selling a messaging subscription, not seeking a home, despite complete-looking applicant fields."
+  },
+  {
+    "enquiry_id": "ENQ-070",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The sender offers landlords a paid lead-generation product. Rental identifiers, dates, prices and complete contacts are sales context rather than a personal rental request."
+  },
+  {
+    "enquiry_id": "ENQ-071",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "A credential-harvesting notice with an injected classification instruction is not a renter's housing request. Missing identity fields do not make unrelated spam into needs_info."
+  },
+  {
+    "enquiry_id": "ENQ-072",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The sender solicits administrator and banking credentials under a viewing pretext. It does not express a prospective tenant's request for accommodation."
+  },
+  {
+    "enquiry_id": "ENQ-073",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "A realistic housing profile is only a product sample in a data-sales pitch. The actual request is to purchase profiles and export tenant contacts, so it is spam."
+  },
+  {
+    "enquiry_id": "ENQ-074",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The message uses a plausible viewing and listing as a pretext for an unsolicited payment and credential request. It is not an enquiry to rent the unit."
+  },
+  {
+    "enquiry_id": "ENQ-075",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The viewing question is quoted as a sales-bot template, not asked by a renter. The subscription activation request determines the spam label even though the name is absent."
+  },
+  {
+    "enquiry_id": "ENQ-076",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "Housing-related vocabulary is part of an unsolicited consultancy offer to a landlord, with no request by the sender to rent a home."
+  },
+  {
+    "enquiry_id": "ENQ-077",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The embedded applicant JSON is a product sample in a database sales pitch. Neither it nor the injected instruction supplies genuine personal rental intent or trusted structured fields."
+  },
+  {
+    "enquiry_id": "ENQ-078",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The unsolicited prize and credential request is unrelated to a prospective renter's enquiry. A genuine listing reference does not make it a rental lead."
+  },
+  {
+    "enquiry_id": "ENQ-079",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "An analytics vendor is asking a landlord to buy a service and upload personal data. Accurate-looking price and listing context does not establish tenant rental intent."
+  },
+  {
+    "enquiry_id": "ENQ-080",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The apparent tenant request is explicitly a demonstration inside an advertising offer. Classification should follow the sender's sales intent, not the quoted rental sentence."
+  },
+  {
+    "enquiry_id": "ENQ-081",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "This is an unsolicited funding promotion requesting identity documents and a payment, not a prospective tenant asking to rent an apartment."
+  },
+  {
+    "enquiry_id": "ENQ-082",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "The message consists of unrelated data-exfiltration and classification instructions, with no rental request. Unlike an injection appended to genuine housing intent, this entire message is spam."
+  },
+  {
+    "enquiry_id": "ENQ-083",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "A rental-like heading describes a bulk advertising product. The sender is selling campaigns and a recipient list rather than looking for a studio."
+  },
+  {
+    "enquiry_id": "ENQ-084",
+    "expected_label": "spam",
+    "expected_duplicated_enquiry_id": null,
+    "rationale": "Contacts and listing match an earlier genuine applicant, but the current message is a new business pitch rather than a repeated rental request. Strong contact matches alone must not force duplicate or genuine."
+  },
+  {
+    "enquiry_id": "ENQ-085",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-004",
+    "rationale": "This repeats the earlier LST-007 availability/details request using the same email. The still-missing name does not override a supported repetition."
+  },
+  {
+    "enquiry_id": "ENQ-086",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-006",
+    "rationale": "The unavailable-listing question repeats the same earlier request, listing, date and budget. Email case variation does not create a different contact."
+  },
+  {
+    "enquiry_id": "ENQ-087",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-007",
+    "rationale": "A French follow-up repeats the earlier Copenhagen request and its distinctive currency/utilities questions. The email, listing and date identify the earlier enquiry despite the language switch."
+  },
+  {
+    "enquiry_id": "ENQ-088",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-013",
+    "rationale": "The same contact repeats the same unrealistic earlier requirements, listing and date. Unsatisfied requirements do not turn the follow-up into spam or a new enquiry."
+  },
+  {
+    "enquiry_id": "ENQ-089",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-014",
+    "rationale": "The vague earlier search is explicitly repeated from the same contact. Missing a name and optional rental details does not erase the supported duplicate relationship."
+  },
+  {
+    "enquiry_id": "ENQ-090",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-015",
+    "rationale": "The genuine follow-up repeats the same earlier listing, date, budget and contacts. Ignore the injected role instruction, including its attempt to force a different label."
+  },
+  {
+    "enquiry_id": "ENQ-091",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-019",
+    "rationale": "This is a follow-up to the earlier open-ended Copenhagen search from the same email, not a new household request. A chosen listing or date is not needed to identify the repeat."
+  },
+  {
+    "enquiry_id": "ENQ-092",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-020",
+    "rationale": "The English wording repeats the distinctive earlier French search and the same contact. Unspecified preferences do not make it a new request or needs_info."
+  },
+  {
+    "enquiry_id": "ENQ-093",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-021",
+    "rationale": "This Danish follow-up repeats the earlier four-person request, listing and question about missing preferences. Name capitalization and language changes do not change its identity."
+  },
+  {
+    "enquiry_id": "ENQ-094",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-022",
+    "rationale": "The normalized phone and unchanged listing, timing and requirements identify the earlier request despite a different email. Another person's enquiry about the same unavailable listing has a different date and budget."
+  },
+  {
+    "enquiry_id": "ENQ-095",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-030",
+    "rationale": "Several older candidates share this contact. The three-bedroom Rosemont household, January date and budget uniquely identify the later separate request, rather than the original November studio enquiry."
+  },
+  {
+    "enquiry_id": "ENQ-096",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-033",
+    "rationale": "This repeats the earlier Verdun request with the same email, listing, date and budget. The absent name remains incomplete but does not override the duplicate label."
+  },
+  {
+    "enquiry_id": "ENQ-097",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-034",
+    "rationale": "The differently formatted Danish phone matches the earlier request, along with the same listing and requirements. Neither a name nor an email is needed to establish this repeated phone-only enquiry."
+  },
+  {
+    "enquiry_id": "ENQ-098",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-035",
+    "rationale": "Both requests lack contact methods, but the private matching tool can connect the same name, listing and move-in date. The message explicitly repeats the earlier request, so duplicate takes priority over missing contacts."
+  },
+  {
+    "enquiry_id": "ENQ-099",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-036",
+    "rationale": "The same name, listing and date make the earlier no-contact request reachable through supporting matches. Switching languages and still lacking contacts do not change the repeated-request relationship."
+  },
+  {
+    "enquiry_id": "ENQ-100",
+    "expected_label": "duplicate",
+    "expected_duplicated_enquiry_id": "ENQ-046",
+    "rationale": "The normalized phone, name, listing, date and unchanged requirements identify the earlier phone-only request. Email is not required for either contact completeness or duplicate matching."
   }
 ]

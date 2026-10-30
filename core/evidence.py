@@ -52,7 +52,18 @@ def _quote_in_text(quote: str, text: str, source: str) -> bool:
 
     normalized_quote = _normalize_for_match(quote, source)
     normalized_text = _normalize_for_match(text, source)
-    return normalized_quote in normalized_text
+
+    # Allow a quote to be found anywhere in the text, even if it is a substring of a larger word.
+    if normalized_quote in normalized_text:
+        return True
+
+    # A quote taken from the middle of a sentence may capitalize its first
+    # letter. Allow only that character to differ, only for message evidence.
+    # Escape the quote so its contents cannot become a regular expression.
+    if source == "message" and normalized_quote:
+        pattern = f"(?i:{re.escape(normalized_quote[0])})" + re.escape(normalized_quote[1:])
+        return re.search(pattern, normalized_text) is not None
+    return False
 
 
 def find_evidence_failures(
@@ -65,6 +76,8 @@ def find_evidence_failures(
 
     - source=message: quote must be found in enquiry_message.
     - source=tool_result: quote must be found in at least one tool result.
+    - Message quotes may differ in the capitalization of their initial letter;
+      other case changes are rejected. Tool-result case is preserved throughout.
     """
 
     failures: list[EvidenceFailure] = []

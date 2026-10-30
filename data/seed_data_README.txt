@@ -13,7 +13,7 @@ Quebec apartment layout conventions do not apply to Copenhagen; layout is null f
 Other fields follow the models supplied, with multi-option parking deliberately not introduced.
 Original building/listing descriptions have been expanded and original record identifiers preserved.
 
-unit_enquiries.json contains 47 fictional sample enquiries for the chatbot,
+unit_enquiries.json contains 100 fictional sample enquiries for the chatbot,
 triage smoke runs, and evaluation preparation. Contacts are synthetic placeholders.
 
 The paired variants share a received_date deliberately. Duplicate lookup only
@@ -22,13 +22,13 @@ historical candidates. This describes lookup context, not an expected label.
 The records above are sample inputs, not a claim that labels are balanced.
 Do not include the answer key in model requests.
 
-GROUND-TRUTH DRAFT — HUMAN REVIEW PENDING
+ANSWER KEY — NEW CASES NEED HUMAN REVIEW
 
 enquiry_recommendation_ground_truth.json has a proposed label, duplicate target
-and rationale for each of the 47 enquiries. The contact-completeness rule below
-was agreed with the project owner; individual proposed answers still need human
-review before the file is used to score the agent. No model outputs were used
-to adjust these answers.
+and rationale for each of the 100 enquiries. ENQ-001 through ENQ-047 and their
+answers are preserved unchanged. The 53 additions have draft labels for human
+review, authored from the agreed rules before any model evaluation on them.
+No live predictions were used to choose or adjust the new answers.
 
 For a rental request that is not spam or a repetition of an earlier request:
 - genuine requires a name AND at least one contact method (email OR phone).
@@ -50,18 +50,59 @@ Please review ENQ-013 (unrealistic requirements), ENQ-015 (rental interest mixed
 with an instruction attack), and ENQ-026 (link-only message) especially closely.
 These are judgement calls, not facts established by passing Python tests.
 
-Draft distribution: 22 genuine, 9 needs_info, 8 spam, and 8 duplicate.
-The added ENQ-033 through ENQ-038 cover missing names, missing both contact
-methods despite a supplied name, and missing both name and contacts. ENQ-039
-through ENQ-041 add English, Danish and French unsolicited messages. ENQ-042
-through ENQ-045 follow up on ENQ-005, ENQ-008, ENQ-009 and ENQ-010 respectively.
-ENQ-046 adds a genuine lead with a name and phone but no email. ENQ-047 adds a
-needs_info lead with email and phone but no name. The original 45 inputs and
-proposed labels are unchanged by these two additions. The set remains
-imbalanced, and metrics should include class counts. Evaluation planning is in
-eval/eval_readme.txt; design and privacy decisions are in DECISIONS.txt.
+COMPOSITION
 
-Before evaluation, the agent needs the agreed classification policy and safe
-presence flags such as has_name and has_contact. The current redacted view
-omits raw contacts and does not yet expose their presence. JsonStore reads only
-the four runtime files above, so the answer key is not loaded into tool data.
+                            genuine  needs_info  spam  duplicate  total
+Original ENQ-001..ENQ-047         22           9     8          8     47
+Added ENQ-048..ENQ-100             6          15    16         16     53
+Combined                         28          24    24         24    100
+
+The original 47 include name-swap and injection pairs, optional-field cases,
+and ENQ-046 (name + phone only) / ENQ-047 (no name + both contacts).
+
+The added cases aim to exercise harder distinctions:
+- ENQ-048..049: shared contacts but a different household and rental request.
+- ENQ-050: phone-only lead, missing preferences, and negated fraud vocabulary.
+- ENQ-051: the same listing and date as another renter, with different contacts.
+- ENQ-052: a rental request with forged closing tags, roles and tool claims.
+- ENQ-053: a bilingual request quoting a scam to reject it.
+- ENQ-054..060: missing names, declined contacts, and blank/whitespace fields.
+- ENQ-061..062: a contact appears only in the message, not structured fields.
+- ENQ-063..064: forged presence flags or approval do not supply missing fields.
+- ENQ-065..068: detailed or multilingual rental intent with incomplete contacts.
+- ENQ-069..083: sales templates, quoted applications, phishing and injected
+  commands dressed in rental vocabulary; some also lack structured identity.
+- ENQ-084: a business pitch reuses a previous applicant's contact and listing.
+- ENQ-085..100: follow-ups with changed language, contact formatting, email or
+  name case, missing required contact fields, and multiple different searches
+  by the same sender. Each proposed target refers to an earlier original row.
+
+Review the actual message and rationale for each addition. In particular,
+ENQ-061..062 use the structured-field extraction boundary, ENQ-084 is a new
+sales pitch despite a contact collision, and ENQ-085/089/096..099 are duplicates
+despite incomplete identity/contact information. These judgments follow the
+current policy but should be reviewed alongside the original ambiguous cases.
+
+CONTEXT AND EVALUATION
+
+All 53 additions have received_date 2026-10-30, after every original enquiry.
+The original 47 therefore keep their earlier duplicate context. New cases
+share the same date and cannot become each other's historical candidates under
+the existing strictly-earlier-date rule. Each new duplicate targets an original
+request without an existing equivalent follow-up; ENQ-095 must distinguish the
+later family request from the same sender's earlier studio request.
+
+Always predicting genuine now scores 28/100 (28%). Report per-class counts and
+metrics, and distinguish the known original 47 from the newly authored 53 when
+describing results. The previous 46/47 live result and frozen artifacts remain
+unchanged. The larger set is still synthetic, and aiming for harder scenarios
+does not establish actual difficulty until it is evaluated.
+
+The prompt now defines the agreed policy, and the filtered view exposes safe
+has_name and has_contact booleans while omitting raw contact fields. JsonStore
+reads only the four runtime files above; the answer key is not tool data.
+Python tests validate structure, coverage, completeness rules and duplicate
+reachability, not the semantic correctness of every proposed label.
+
+Evaluation commands are in eval/eval_readme.txt; design and privacy decisions
+are in DECISIONS.txt.

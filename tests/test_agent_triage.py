@@ -363,6 +363,29 @@ def test_triage_rejects_plain_string_evidence_without_creating_a_review(tmp_path
     assert events[-1].run_succeeded is False
 
 
+def test_triage_accepts_enq_019_initial_capitalization_and_records_success(tmp_path):
+    enquiry = JsonStore().get_enquiry("ENQ-019")
+    quote = "Jeg søger en lejlighed i København."
+    client = FakeAnthropicClient([text_response(json.dumps({
+        "referred_enquiry_id": enquiry.enquiry_id,
+        "label": "genuine",
+        "reason": "The message expresses rental intent and the structured contact fields are complete.",
+        "evidence": [{"source": "message", "quote": quote, "support": "States a rental search."}],
+    }))])
+
+    result = triage_enquiry(
+        enquiry, client, JsonStore(), audit_dir=tmp_path / "audit", output_dir=tmp_path / "output",
+    )
+
+    assert result.recommendation.evidence[0].quote == quote
+    assert "Hej, jeg søger" in enquiry.message
+    events = read_events(tmp_path / "audit" / f"{result.run_id}.jsonl")
+    guard = next(event for event in events if event.guard == "evidence_check")
+    assert guard.guard_passed is True
+    assert events[-1].run_succeeded is True
+    assert (tmp_path / "output/reviews/ENQ-019" / f"{result.run_id}.json").exists()
+
+
 def test_triage_can_skip_output_saving(tmp_path, monkeypatch):
     def unexpected_save(*args, **kwargs):
         pytest.fail("Saving must be skipped when output_dir is None.")

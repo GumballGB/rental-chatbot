@@ -1,0 +1,34 @@
+Label accuracy: 46/47 (97.9%)
+
+Confusion matrix (rows=expected, columns=predicted)
+Expected    genuine  needs_info  spam  duplicate  no recommendation
+genuine     21       0           0     0          1
+needs_info  0        9           0     0          0
+spam        0        0           8     0          0
+duplicate   0        0           0     8          0
+
+Per-class metrics
+Label       Support  Predicted  Precision  Recall
+genuine     22       21         100.0%     95.5%
+needs_info  9        9          100.0%     100.0%
+spam        8        8          100.0%     100.0%
+duplicate   8        8          100.0%     100.0%
+
+Duplicate exact outcomes: 8/8 (100.0%)
+
+Failed runs: 1/47
+
+ENQ-019: ValueError: Recommendation failed evidence check: evidence[0] not found in message
+
+---
+
+
+
+This is the very first evaluation run!
+Reason for the failed entry: Capitalization problem with 'jeg' (jeg vs Jeg), 
+'jeg' means 'I' in English. 
+
+"model": "claude-haiku-5-5"
+"started_at": "2026-10-30T14:58:51.122447+00:00"
+"finished_at": "2026-10-30T15:02:11.139890+00:00"
+"cost" (aproximately): $0.05
