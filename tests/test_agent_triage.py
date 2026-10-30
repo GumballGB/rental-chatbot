@@ -3,6 +3,7 @@
 import json
 
 import pytest
+from pydantic import ValidationError
 
 from agents.agent_triage import triage_enquiry
 from core.audit import read_events
@@ -322,6 +323,44 @@ def successful_client():
             }],
         })),
     ])
+
+
+def test_triage_sends_the_complete_recommendation_schema(tmp_path):
+    client = successful_client()
+
+    result = triage_enquiry(
+        make_enquiry(), client, JsonStore(), audit_dir=tmp_path, output_dir=None,
+    )
+
+    system = client.messages.calls[0]["system"]
+    schema = json.loads(system.split("\n\nRecommendation response JSON schema:\n", 1)[1])
+    assert schema == Recommendation.model_json_schema()
+    evidence_schema = schema["$defs"]["Evidence"]
+    assert evidence_schema["type"] == "object"
+    assert set(evidence_schema["required"]) == {"source", "quote", "support"}
+    assert result.recommendation.evidence[0].source == "message"
+
+
+def test_triage_rejects_plain_string_evidence_without_creating_a_review(tmp_path):
+    client = FakeAnthropicClient([text_response(json.dumps({
+        "referred_enquiry_id": "ENQ-001",
+        "duplicated_enquiry_id": None,
+        "label": "genuine",
+        "reason": "Clear rental intent.",
+        "evidence": ["looking for a studio in Griffintown"],
+    }))])
+
+    with pytest.raises(ValidationError) as error:
+        triage_enquiry(
+            make_enquiry(), client, JsonStore(),
+            audit_dir=tmp_path / "audit", output_dir=tmp_path / "output",
+        )
+
+    assert error.value.errors()[0]["loc"] == ("evidence", 0)
+    assert not (tmp_path / "output").exists()
+    events = read_events(next((tmp_path / "audit").glob("*.jsonl")))
+    assert events[-1].type == "run_finished"
+    assert events[-1].run_succeeded is False
 
 
 def test_triage_can_skip_output_saving(tmp_path, monkeypatch):
