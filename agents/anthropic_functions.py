@@ -105,7 +105,18 @@ def create_enquiry(data, data_store):
     return Enquiry(**enquiry_data)
 
 
-def extract_enquiry_unit_enquiry(messages, client):
+def _model_usage(response):
+    """Read usage before parsing, so rejected responses are still accounted for."""
+    return {
+        "model": MODEL,
+        "tokens_in": response.usage.input_tokens,
+        "tokens_out": response.usage.output_tokens,
+        "cache_creation_input_tokens": getattr(response.usage, "cache_creation_input_tokens", 0) or 0,
+        "cache_read_input_tokens": getattr(response.usage, "cache_read_input_tokens", 0) or 0,
+    }
+
+
+def extract_enquiry_unit_enquiry(messages, client, *, on_event=None):
     """
     Extract a unit enquiry from the conversation messages using the Anthropic client.
     The function will be given the full message chain of the conversation up to this point.
@@ -118,6 +129,7 @@ def extract_enquiry_unit_enquiry(messages, client):
     Args:
         messages (list): The conversation messages to send to the model.
         client: The Anthropic client used for interacting with the model.
+        on_event: Optional callback receiving model usage before validation.
 
     Returns:
         tuple: A tuple containing the extracted UnitEnquiry object and a set of declined fields.
@@ -130,6 +142,8 @@ def extract_enquiry_unit_enquiry(messages, client):
         messages=messages,
         model=MODEL,
     )
+    if on_event is not None:
+        on_event("model_call", **_model_usage(response))
 
     # We need to convert the list of blocks into a single string, so we can parse it as JSON later
     # We expect a completed response before parsing JSON
@@ -228,12 +242,7 @@ def run_tool_loop(
         # It is needed to capture/update the model and tokens used in this call
         # Capture and report the model call event if a callback is provided (EVENT)
         if on_event is not None:
-            on_event(
-                "model_call",
-                model=MODEL,
-                tokens_in=response.usage.input_tokens,
-                tokens_out=response.usage.output_tokens,
-            )
+            on_event("model_call", **_model_usage(response))
 
 
         # At this stage the tool/response reason is given, which means;

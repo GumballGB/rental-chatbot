@@ -386,5 +386,407 @@
         "content": "done"
       }
     ]
+  },
+  {
+    "conversation_id": "CHAT-011",
+    "title": "Use the applicant contacts, not a relative contacts",
+    "messages": [
+      {
+        "role": "user",
+        "content": "My sister Sara has been helping me search. Her email is sara.relative.chat@example.com and her number is +1 514 555 0190. She is not applying. I am Nadia Benali and I want LST-037 from June 1, 2027, with a maximum budget of 2,000 CAD."
+      },
+      {
+        "role": "assistant",
+        "content": "What are your own contact details for this application?"
+      },
+      {
+        "role": "user",
+        "content": "My own email is nadia.benali.chat@example.com and my number is +1 514 555 0111. Please contact me, not Sara."
+      },
+      {
+        "role": "assistant",
+        "content": "Thank you. The enquiry is for you and uses your own contact details."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-012",
+    "title": "Withdraw a previously supplied phone number",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I'm Théo Bouchard. I choose LST-034 from May 1, 2027, with a maximum budget of 2,600 CAD. Email theo.bouchard.chat@example.com or call +1 514 555 0112."
+      },
+      {
+        "role": "assistant",
+        "content": "I have those details. Would you like to change anything?"
+      },
+      {
+        "role": "user",
+        "content": "Yes. Remove that phone number from my enquiry. I do not want to provide any phone number. Keep my email for contacting me; all other details stay the same."
+      },
+      {
+        "role": "assistant",
+        "content": "Understood. Contact will be by email and the phone field is declined."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-013",
+    "title": "Danish withdrawal of a previously supplied email",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hej, jeg hedder Freja Holm. Jeg vælger LST-105 fra 1. juni 2027 med et maksimalt budget på 11.000 DKK. Min e-mail er freja.old.chat@example.com, og mit nummer er +45 66 76 86 96."
+      },
+      {
+        "role": "assistant",
+        "content": "Tak. Er alle oplysningerne korrekte?"
+      },
+      {
+        "role": "user",
+        "content": "Fjern min e-mailadresse fra forespørgslen. Jeg ønsker ikke at oplyse nogen e-mailadresse. Ring til mig på det nummer, jeg allerede har givet. Resten er korrekt."
+      },
+      {
+        "role": "assistant",
+        "content": "Det er noteret. E-mail er fravalgt, og vi bruger dit telefonnummer."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-014",
+    "title": "Choose final budget and date among alternatives",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I'm Omar Diallo, omar.diallo.chat@example.com. I am interested in LST-034. My current rent is 1,800 CAD and my sister pays 3,200. Neither amount is my budget for this search. I am comparing April 1 and May 1, 2027."
+      },
+      {
+        "role": "assistant",
+        "content": "What maximum budget and move-in date should I record?"
+      },
+      {
+        "role": "user",
+        "content": "I briefly considered a ceiling of 2,800 CAD, but my final maximum is 2,500 CAD. May 1, 2027 is my final move-in date; do not use April."
+      },
+      {
+        "role": "assistant",
+        "content": "Understood. Would you like to add a phone number?"
+      },
+      {
+        "role": "user",
+        "content": "I have not decided whether to add a phone yet. The email is correct."
+      },
+      {
+        "role": "assistant",
+        "content": "Thank you. No phone number has been supplied."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-015",
+    "title": "French and English mixed within a conversation",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Bonjour, je m'appelle Inès Caron. I choose LST-037 in Verdun. Mon budget maximal est 1 900 CAD et je veux emménager le 1er septembre 2027."
+      },
+      {
+        "role": "assistant",
+        "content": "Quel courriel et quel numéro de téléphone souhaitez-vous fournir?"
+      },
+      {
+        "role": "user",
+        "content": "My email is ines.caron.chat@example.com. Je n'ai pas encore décidé si j'ajouterai un numéro de téléphone; je déciderai plus tard. Email is best for now."
+      },
+      {
+        "role": "assistant",
+        "content": "Merci. Le courriel est fourni, le téléphone reste à déterminer."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-016",
+    "title": "Danish and English mixed with formatted contact details",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hej, jeg hedder Asta Søndergaard. I want LST-137 in Islands Brygge. Mit maksimale budget er 12.000 DKK, og jeg vil flytte ind den 15. august 2027."
+      },
+      {
+        "role": "assistant",
+        "content": "What contact details should I use?"
+      },
+      {
+        "role": "user",
+        "content": "Skriv til asta.sondergaard.chat@example.com, or call +45 (67) 77 87 97. Those are my details."
+      },
+      {
+        "role": "assistant",
+        "content": "Tak. Dine oplysninger er noteret."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-017",
+    "title": "Long message with irrelevant numbers and dates",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I'm Victor Nguyen, and this enquiry is for me alone. I choose LST-002 in Griffintown. My actual maximum monthly budget is 2,100 CAD, and my actual move-in date is February 1, 2027. My email is victor.nguyen.chat@example.com and my own phone is +1 514 555 0117. The rest of this message is background, not application values. I currently live in apartment 309 on the fourth floor. Last year's moving invoice was 1,450 CAD; it was a one-time bill, not monthly rent. A friend pays 2,700 CAD and moved on July 15, 2026; neither figure describes my plans. I have 42 boxes, two bookcases, a 27-inch monitor and a desk that is 120 cm wide. My work project has reference 2027-08-19, which is just an internal reference and not a move-in date. The lift inspection for my current building is scheduled on December 12, 2026, but I am not moving that day. I will arrange movers myself, so no one else's contacts should be included. I mention the furniture because I want to ask whether a desk fits near the window, and I mention the lift because I will eventually need to reserve it. Neither changes the maximum budget, chosen listing or date I gave at the beginning. Can we organise a viewing?"
+      },
+      {
+        "role": "assistant",
+        "content": "Yes. To confirm, should I keep the application details from the beginning of your message?"
+      },
+      {
+        "role": "user",
+        "content": "Yes, keep those original application details. All the later numbers were background only."
+      },
+      {
+        "role": "assistant",
+        "content": "Thank you. I have kept your stated application details."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-018",
+    "title": "Ambiguous numeric date remains unresolved",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I'm Nora Jensen, nora.jensen.chat@example.com. I choose LST-105 with a maximum budget of 10,500 DKK. I wrote 03/04/2027 in my notes, but I cannot remember whether I meant March 4 or April 3."
+      },
+      {
+        "role": "assistant",
+        "content": "Can you clarify which date you want to move?"
+      },
+      {
+        "role": "user",
+        "content": "No, I need to check my calendar first. Leave my move-in date unknown for now; do not choose either date."
+      },
+      {
+        "role": "assistant",
+        "content": "Understood. The date remains unknown."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-019",
+    "title": "General office question with no application facts",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What are your office opening hours? This is only a general question. I have not chosen a listing, budget or move-in date and I am not submitting a rental application today."
+      },
+      {
+        "role": "assistant",
+        "content": "For this fictional example, the office is open Monday to Friday from 9 to 17. No application details have been provided."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-020",
+    "title": "Ambiguous numeric date is clarified in a follow-up",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Je m'appelle Julien Mercier. Mon courriel est julien.mercier.chat@example.com. Je choisis LST-037 avec un budget maximal de 2 000 CAD. Pour la date, j'ai écrit 03/04/2027."
+      },
+      {
+        "role": "assistant",
+        "content": "Voulez-vous dire le 4 mars ou le 3 avril 2027?"
+      },
+      {
+        "role": "user",
+        "content": "Le 3 avril 2027, donc le mois d'avril. Pas le 4 mars."
+      },
+      {
+        "role": "assistant",
+        "content": "Merci pour la précision. Je note le 3 avril 2027."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-021",
+    "title": "English consistency pair: full sentences",
+    "messages": [
+      {
+        "role": "user",
+        "content": "My name is Sofia Mendes. I would like to choose LST-002 in Griffintown. I can spend at most 2,300 CAD per month and I want to move on October 1, 2027. My email is sofia.mendes.pair@example.com and my phone number is +1 514 555 0121. Could you arrange a viewing?"
+      },
+      {
+        "role": "assistant",
+        "content": "Thank you. I have your selected listing, budget, date and contacts."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ],
+    "pair_id": "PAIR-EN"
+  },
+  {
+    "conversation_id": "CHAT-022",
+    "title": "English consistency pair: short messages and typos",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hi, Sofia Mendes here. LST-002 plz, Griffintown. Max CAD 2300/mo."
+      },
+      {
+        "role": "assistant",
+        "content": "When would you like to move?"
+      },
+      {
+        "role": "user",
+        "content": "Oct 1 2027. Looking for a veiwing too."
+      },
+      {
+        "role": "assistant",
+        "content": "What contact details should I note?"
+      },
+      {
+        "role": "user",
+        "content": "email sofia.mendes.pair@example.com / phone (514) 555-0121"
+      },
+      {
+        "role": "assistant",
+        "content": "Thank you. Those details are recorded."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ],
+    "pair_id": "PAIR-EN"
+  },
+  {
+    "conversation_id": "CHAT-023",
+    "title": "Cross-language consistency pair: Danish",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hej, jeg hedder Rasmus Østergaard. Jeg vælger LST-105 på Amagerbro fra 1. november 2027. Mit maksimale budget er 11.000 DKK."
+      },
+      {
+        "role": "assistant",
+        "content": "Hvilke kontaktoplysninger vil du give?"
+      },
+      {
+        "role": "user",
+        "content": "Min e-mail er rasmus.ostergaard.pair@example.com. Jeg ønsker ikke at oplyse et telefonnummer."
+      },
+      {
+        "role": "assistant",
+        "content": "Det er noteret. Vi bruger e-mail, og telefon er fravalgt."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ],
+    "pair_id": "PAIR-DK"
+  },
+  {
+    "conversation_id": "CHAT-024",
+    "title": "Cross-language consistency pair: English",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I'm Rasmus Østergaard and I choose LST-105 in Amagerbro. My maximum budget is 11,000 DKK."
+      },
+      {
+        "role": "assistant",
+        "content": "When would you like to move?"
+      },
+      {
+        "role": "user",
+        "content": "November 1, 2027."
+      },
+      {
+        "role": "assistant",
+        "content": "What email and phone should I use?"
+      },
+      {
+        "role": "user",
+        "content": "My email is rasmus.ostergaard.pair@example.com. I do not want to provide any phone number."
+      },
+      {
+        "role": "assistant",
+        "content": "Understood. We will use email and mark the phone as declined."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ],
+    "pair_id": "PAIR-DK"
+  },
+  {
+    "conversation_id": "CHAT-025",
+    "title": "Resolve a listing and date through a reference to earlier options",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I'm Malik Roy, malik.roy.chat@example.com. I want a place in Montréal, but I have not chosen the listing or move-in date yet. My maximum budget is 2,600 CAD."
+      },
+      {
+        "role": "assistant",
+        "content": "For this fictional enquiry, the options are LST-037 first and LST-041 second. Possible move-in dates are June 1, 2027 and July 1, 2027. Which do you choose?"
+      },
+      {
+        "role": "user",
+        "content": "The second listing and the later date, please. Keep the budget and email I already gave."
+      },
+      {
+        "role": "assistant",
+        "content": "Understood. I have recorded your choice."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
   }
 ]

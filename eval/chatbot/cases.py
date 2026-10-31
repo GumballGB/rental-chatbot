@@ -68,11 +68,20 @@ def load_cases(data_dir: str | Path = DEFAULT_DATA_DIR) -> tuple[list[dict], lis
     if not by_id or set(by_id) != set(expected):
         raise ValueError("The answer key must cover every conversation exactly once.")
 
-    # Validate each conversation's messages.
+    pairs = {}
+    # Pair metadata is for scoring only, never model input.
     for conversation_id, conversation in by_id.items():
+
+        if "pair_id" in conversation:
+            pair_id = conversation["pair_id"]
+            if not isinstance(pair_id, str) or not pair_id.strip():
+                raise ValueError(f"{conversation_id}: pair_id must be a nonblank string.")
+            pairs.setdefault(pair_id, []).append(conversation_id)
         messages = conversation.get("messages")
+
         if not isinstance(messages, list) or len(messages) < 3 or len(messages) % 2 != 1:
             raise ValueError(f"{conversation_id}: expected user/assistant turns ending in user done.")
+        
         for index, message in enumerate(messages):
             role = "user" if index % 2 == 0 else "assistant"
             if not isinstance(message, dict) or set(message) != {"role", "content"}:
@@ -83,6 +92,11 @@ def load_cases(data_dir: str | Path = DEFAULT_DATA_DIR) -> tuple[list[dict], lis
                 raise ValueError(f"{conversation_id}: done must end the conversation.")
         if messages[-1]["content"].strip().lower() != "done":
             raise ValueError(f"{conversation_id}: conversation must end in done.")
+    for pair_id, ids in pairs.items():
+        if len(ids) != 2:
+            raise ValueError(f"{pair_id}: a consistency pair must have exactly two conversations.")
+        if expected[ids[0]]["expected"] != expected[ids[1]]["expected"]:
+            raise ValueError(f"{pair_id}: paired conversations must have identical expected final fields.")
     return conversations, answers
 
 

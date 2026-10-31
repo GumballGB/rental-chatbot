@@ -1,6 +1,7 @@
 """Render evaluation metrics as a readable text report."""
 
 from eval.agent_triage.metrics import LABELS, NO_RECOMMENDATION
+from eval.cost import render_cost
 
 
 def _percentage(value: float | None) -> str:
@@ -63,5 +64,8 @@ def render_metrics(report: dict) -> str:
         sections.append("\n".join(
             f"{failure['enquiry_id']}: {failure['error']}" for failure in report["failures"]
         ))
+
+    if "cost" in report:
+        sections.append(render_cost(report["cost"]))
 
     return "\n\n".join(sections)

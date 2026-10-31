@@ -16,9 +16,14 @@ from agents.anthropic_functions import (
     extract_enquiry_unit_enquiry,
 )
 from core.writer import DEFAULT_OUTPUT_DIR
-from eval.chatbot.cases import DEFAULT_DATA_DIR, extraction_messages, load_cases
+from eval.chatbot.cases import (
+    DEFAULT_DATA_DIR,
+    extraction_messages,
+    load_cases,
+)
 from eval.chatbot.metrics import calculate_metrics
 from eval.chatbot.report import render_metrics
+from eval.cost import chatbot_cost, save_cost_report
 
 DEFAULT_EVAL_DIR = DEFAULT_OUTPUT_DIR / "eval" / "chatbot"
 
@@ -40,6 +45,7 @@ def run_evaluation(
     if limit is not None and limit <= 0:
         raise ValueError("limit must be positive.")
     conversations, answers = load_cases(data_dir)
+
     if limit is not None:
         conversations = conversations[:limit]
     selected = {case["conversation_id"] for case in conversations}
@@ -50,11 +56,21 @@ def run_evaluation(
     _save_json(run_dir / "conversations.json", conversations)
     _save_json(run_dir / "expected_answers.json", answers)
     predictions = []
+    usage = []
     _save_json(run_dir / "predictions.json", predictions)
+    _save_json(run_dir / "usage.json", usage)
+
     for index, case in enumerate(conversations, start=1):
         prediction = {"conversation_id": case["conversation_id"], "extracted": None, "error": None}
+
+        def record_usage(event_type, *, conversation_id=case["conversation_id"], **details):
+            usage.append({"conversation_id": conversation_id, **details})
+            _save_json(run_dir / "usage.json", usage)
+
         try:
-            enquiry, declined = extract_enquiry_unit_enquiry(extraction_messages(case), client)
+            enquiry, declined = extract_enquiry_unit_enquiry(
+                extraction_messages(case), client, on_event=record_usage,
+            )
             prediction["extracted"] = {**enquiry.model_dump(mode="json"), "declined_fields": sorted(declined)}
         except (ValueError, TypeError, RuntimeError, AnthropicError) as error:
             prediction["error"] = f"{type(error).__name__}: {error}"
@@ -63,12 +79,14 @@ def run_evaluation(
         status = "extracted" if not prediction["error"] else "failed"
         show(f"[{index}/{len(conversations)}] {case['conversation_id']}: {status}")
 
-    metrics = calculate_metrics(answers, predictions)
+    metrics = calculate_metrics(answers, predictions, conversations=conversations)
     metrics["metadata"] = {
         "model": MODEL, "stage": "final_extraction", "max_tokens": EXTRACTION_MAX_TOKENS,
         "started_at": started_at,
         "finished_at": datetime.now(UTC).isoformat(), "data_dir": str(Path(data_dir).resolve()),
     }
+    metrics["cost"] = chatbot_cost(usage, predictions)
+    save_cost_report(run_dir, metrics["cost"])
     _save_json(run_dir / "metrics.json", metrics)
     text = render_metrics(metrics)
     (run_dir / "report.txt").write_text(text + "\n", encoding="utf-8")

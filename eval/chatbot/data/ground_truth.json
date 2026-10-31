@@ -127,5 +127,208 @@
       "listing_id": "LST-037",
       "declined_fields": []
     }
+  },
+  {
+    "conversation_id": "CHAT-011",
+    "expected": {
+      "name": "Nadia Benali",
+      "email": "nadia.benali.chat@example.com",
+      "phone": "+1-514-555-0111",
+      "move_in_date": "2027-06-01",
+      "budget": 2000,
+      "listing_id": "LST-037",
+      "declined_fields": []
+    },
+    "notes": "Sara is explicitly not the applicant. Keep only Nadia and her own contacts."
+  },
+  {
+    "conversation_id": "CHAT-012",
+    "expected": {
+      "name": "Théo Bouchard",
+      "email": "theo.bouchard.chat@example.com",
+      "phone": null,
+      "move_in_date": "2027-05-01",
+      "budget": 2600,
+      "listing_id": "LST-034",
+      "declined_fields": [
+        "phone"
+      ]
+    },
+    "notes": "An explicit final correction removes the earlier phone; the user also explicitly refuses to supply a phone. Email remains valid."
+  },
+  {
+    "conversation_id": "CHAT-013",
+    "expected": {
+      "name": "Freja Holm",
+      "email": null,
+      "phone": "+45 66 76 86 96",
+      "move_in_date": "2027-06-01",
+      "budget": 11000,
+      "listing_id": "LST-105",
+      "declined_fields": [
+        "email"
+      ]
+    },
+    "notes": "The final explicit refusal and removal replace the earlier email. The phone was not withdrawn."
+  },
+  {
+    "conversation_id": "CHAT-014",
+    "expected": {
+      "name": "Omar Diallo",
+      "email": "omar.diallo.chat@example.com",
+      "phone": null,
+      "move_in_date": "2027-05-01",
+      "budget": 2500,
+      "listing_id": "LST-034",
+      "declined_fields": []
+    },
+    "notes": "Use the final stated maximum and date. An undecided phone is missing, not explicitly declined; current rent and another person rent are decoys."
+  },
+  {
+    "conversation_id": "CHAT-015",
+    "expected": {
+      "name": "Inès Caron",
+      "email": "ines.caron.chat@example.com",
+      "phone": null,
+      "move_in_date": "2027-09-01",
+      "budget": 1900,
+      "listing_id": "LST-037",
+      "declined_fields": []
+    },
+    "notes": "The name keeps its accent. Phone is expressly undecided rather than a final refusal."
+  },
+  {
+    "conversation_id": "CHAT-016",
+    "expected": {
+      "name": "Asta Søndergaard",
+      "email": "asta.sondergaard.chat@example.com",
+      "phone": "+45 67 77 87 97",
+      "move_in_date": "2027-08-15",
+      "budget": 12000,
+      "listing_id": "LST-137",
+      "declined_fields": []
+    },
+    "notes": "Extract facts across both languages; normalize phone punctuation only and preserve the name spelling."
+  },
+  {
+    "conversation_id": "CHAT-017",
+    "expected": {
+      "name": "Victor Nguyen",
+      "email": "victor.nguyen.chat@example.com",
+      "phone": "+1-514-555-0117",
+      "move_in_date": "2027-02-01",
+      "budget": 2100,
+      "listing_id": "LST-002",
+      "declined_fields": []
+    },
+    "notes": "Use the explicitly identified application fields at the beginning. Invoice, friend rent/date, furniture measurements and project reference are not replacements."
+  },
+  {
+    "conversation_id": "CHAT-018",
+    "expected": {
+      "name": "Nora Jensen",
+      "email": "nora.jensen.chat@example.com",
+      "phone": null,
+      "move_in_date": null,
+      "budget": 10500,
+      "listing_id": "LST-105",
+      "declined_fields": []
+    },
+    "notes": "The user explicitly leaves the date unknown. Uncertainty is not a declined field; no phone was requested or refused."
+  },
+  {
+    "conversation_id": "CHAT-019",
+    "expected": {
+      "name": null,
+      "email": null,
+      "phone": null,
+      "move_in_date": null,
+      "budget": null,
+      "listing_id": null,
+      "declined_fields": []
+    },
+    "notes": "No name, contact, listing, budget or unambiguous move-in date is provided. Opening hours are not application facts, and there are no explicit field refusals."
+  },
+  {
+    "conversation_id": "CHAT-020",
+    "expected": {
+      "name": "Julien Mercier",
+      "email": "julien.mercier.chat@example.com",
+      "phone": null,
+      "move_in_date": "2027-04-03",
+      "budget": 2000,
+      "listing_id": "LST-037",
+      "declined_fields": []
+    },
+    "notes": "Use the explicit clarification rather than interpreting the numeric date by locale."
+  },
+  {
+    "conversation_id": "CHAT-021",
+    "expected": {
+      "name": "Sofia Mendes",
+      "email": "sofia.mendes.pair@example.com",
+      "phone": "+1-514-555-0121",
+      "move_in_date": "2027-10-01",
+      "budget": 2300,
+      "listing_id": "LST-002",
+      "declined_fields": []
+    },
+    "notes": "Same final facts as CHAT-022. Differences in wording, turn count and phone formatting must not change the extracted fields."
+  },
+  {
+    "conversation_id": "CHAT-022",
+    "expected": {
+      "name": "Sofia Mendes",
+      "email": "sofia.mendes.pair@example.com",
+      "phone": "+1-514-555-0121",
+      "move_in_date": "2027-10-01",
+      "budget": 2300,
+      "listing_id": "LST-002",
+      "declined_fields": []
+    },
+    "notes": "Same final facts as CHAT-021. Typos are outside the identity fields; a missing optional North American country prefix normalizes to the same phone."
+  },
+  {
+    "conversation_id": "CHAT-023",
+    "expected": {
+      "name": "Rasmus Østergaard",
+      "email": "rasmus.ostergaard.pair@example.com",
+      "phone": null,
+      "move_in_date": "2027-11-01",
+      "budget": 11000,
+      "listing_id": "LST-105",
+      "declined_fields": [
+        "phone"
+      ]
+    },
+    "notes": "Same final facts and explicit phone refusal as CHAT-024. Keep the Danish spelling of the supplied name in both languages."
+  },
+  {
+    "conversation_id": "CHAT-024",
+    "expected": {
+      "name": "Rasmus Østergaard",
+      "email": "rasmus.ostergaard.pair@example.com",
+      "phone": null,
+      "move_in_date": "2027-11-01",
+      "budget": 11000,
+      "listing_id": "LST-105",
+      "declined_fields": [
+        "phone"
+      ]
+    },
+    "notes": "English rewording of CHAT-023 with the same name, contacts, listing, budget, date and final refusal set."
+  },
+  {
+    "conversation_id": "CHAT-025",
+    "expected": {
+      "name": "Malik Roy",
+      "email": "malik.roy.chat@example.com",
+      "phone": null,
+      "move_in_date": "2027-07-01",
+      "budget": 2600,
+      "listing_id": "LST-041",
+      "declined_fields": []
+    },
+    "notes": "The user explicitly selects the second option, LST-041, and the later date, July 1. Assistant options alone were not selections."
   }
 ]

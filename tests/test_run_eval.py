@@ -5,6 +5,7 @@ import json
 import pytest
 
 from eval.agent_triage.run_eval import main, run_evaluation
+from eval.cost import saved_run_cost
 from tests.fakes import FakeAnthropicClient, text_response, tool_use_response
 
 
@@ -52,11 +53,15 @@ def read_json(path):
 
 def test_evaluation_records_success_failure_and_continues_without_creating_reviews(eval_data, tmp_path):
     original_files = {path.name: path.read_bytes() for path in eval_data.iterdir()}
-    client = FakeAnthropicClient([
+    responses = [
         recommendation_response("ENQ-001"),
         recommendation_response("ENQ-002", "needs_info", quote="This quote was invented."),
         recommendation_response("ENQ-003", "spam"),
-    ])
+    ]
+    for response, (incoming, outgoing) in zip(responses, [(1000, 500), (2000, 300), (1000, 1024)]):
+        response.usage.input_tokens = incoming
+        response.usage.output_tokens = outgoing
+    client = FakeAnthropicClient(responses)
     shown = []
 
     run_dir = run_evaluation(
@@ -77,6 +82,10 @@ def test_evaluation_records_success_failure_and_continues_without_creating_revie
     assert metrics["correct"] == 2
     assert metrics["failed"] == 1
     assert metrics["accuracy"] == pytest.approx(2 / 3)
+    assert metrics["cost"]["estimated_cost_usd"] == pytest.approx(0.001312)
+    assert metrics["cost"]["model_calls"] == 3
+    assert metrics["cost"] == read_json(run_dir / "cost.json") == saved_run_cost(run_dir)
+    assert "Estimated token cost (USD): $0.001312" in (run_dir / "report.txt").read_text(encoding="utf-8")
     assert metrics["metadata"]["model"]
     assert metrics["metadata"]["max_tokens"] == 2048
     assert all(call["max_tokens"] == 2048 for call in client.messages.calls)
@@ -112,6 +121,7 @@ def test_selection_scores_a_subset_but_duplicate_tools_keep_the_full_store(eval_
     metrics = read_json(run_dir / "metrics.json")
     assert metrics["total"] == 1
     assert metrics["duplicate_outcomes"] == {"correct": 1, "total": 1, "accuracy": 1.0}
+    assert metrics["cost"]["model_calls"] == 2
     tool_result = client.messages.calls[1]["messages"][-1]["content"][0]["content"]
     assert "ENQ-001" in tool_result
     assert len(read_json(run_dir / "expected_answers.json")) == 1
@@ -184,6 +194,8 @@ def test_truncation_remains_a_failed_case_and_evaluation_continues(eval_data, tm
     assert metrics["correct"] == 2
     assert metrics["failed"] == 1
     assert len(client.messages.calls) == 3
+    assert metrics["cost"]["output_tokens"] == 2048
+    assert metrics["cost"]["estimated_cost_usd"] == pytest.approx(0.001024)
 
 
 def test_repeated_evaluations_keep_previous_outputs(eval_data, tmp_path):
@@ -197,6 +209,21 @@ def test_repeated_evaluations_keep_previous_outputs(eval_data, tmp_path):
 
     assert first != second
     assert first_files == {path.relative_to(first): path.read_bytes() for path in first.rglob("*") if path.is_file()}
+
+
+def test_future_cache_usage_is_preserved_and_not_silently_underpriced(eval_data, tmp_path):
+    response = recommendation_response("ENQ-001")
+    response.usage.cache_read_input_tokens = 4000
+    client = FakeAnthropicClient([response])
+
+    run_dir = run_evaluation(client, eval_data, tmp_path / "eval", limit=1, show=lambda _: None)
+
+    metrics = read_json(run_dir / "metrics.json")
+    assert metrics["correct"] == 1
+    assert metrics["cost"]["estimated_cost_usd"] is None
+    assert "cache" in " ".join(metrics["cost"]["warnings"])
+    events = [json.loads(line) for line in next(run_dir.glob("audit/**/*.jsonl")).read_text(encoding="utf-8").splitlines()]
+    assert next(event for event in events if event["type"] == "model_call")["cache_read_input_tokens"] == 4000
 
 
 @pytest.mark.parametrize("problem", ["missing_answer", "unknown_enquiry", "duplicate_answer", "invalid_label"])

@@ -1,0 +1,6 @@
+Token usage: 748,896 input / 68,827 output; 254 model calls
+Estimated token cost (USD): $0.109303
+Average per case, including failures (USD): $0.00109303
+claude-haiku-5-5: $0.10 input / $0.50 output per million tokens; prompts over 100,000: $0.50 / $2.50. Checked 2026-10-31.
+Pricing source: https://platform.claude.com/docs/en/about-claude/pricing
+Standard uncached API response tokens, including failed cases. Excludes discounts, taxes and retries or requests with no recorded response. Older audit logs do not record cache counters; uncached requests are assumed.

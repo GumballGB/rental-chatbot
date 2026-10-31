@@ -1,0 +1,28 @@
+Label accuracy: 97/100 (97.0%)
+
+Confusion matrix (rows=expected, columns=predicted)
+Expected    genuine  needs_info  spam  duplicate  no recommendation
+genuine     26       0           0     1          1
+needs_info  0        23          0     1          0
+spam        0        0           24    0          0
+duplicate   0        0           0     24         0
+
+Per-class metrics
+Label       Support  Predicted  Precision  Recall
+genuine     28       26         100.0%     92.9%
+needs_info  24       23         100.0%     95.8%
+spam        24       24         100.0%     100.0%
+duplicate   24       26         92.3%      100.0%
+
+Duplicate exact outcomes: 24/24 (100.0%)
+
+Failed runs: 1/100
+
+ENQ-019: ValueError: Recommendation failed evidence check: evidence[2] not found in tool results
+
+---
+
+"model": "claude-haiku-5-5",
+"max_tokens": 2048,
+"started_at": "2026-10-31T15:08:59.481359+00:00",
+"finished_at": "2026-10-31T15:15:46.696872+00:00",

@@ -1,0 +1,58 @@
+Whole result correct: 25/25 (100.0%)
+Failed extractions: 0/25
+Paired consistency: 2/2 (100.0%)
+Pairs with both results correct: 2/2
+Consistency compares final fields; matching outputs can still both be wrong.
+
+Field          Correct/total   Accuracy   Supplied correct   Invented   Omitted   Wrong
+name           25/25           100.0%     23/23              0          0         0
+email          25/25           100.0%     22/22              0          0         0
+phone          25/25           100.0%     12/12              0          0         0
+move_in_date   25/25           100.0%     22/22              0          0         0
+budget         25/25           100.0%     22/22              0          0         0
+listing_id     25/25           100.0%     23/23              0          0         0
+
+Declined fields exact match: 25/25 (100.0%)
+Supplied correct excludes expected nulls. Failed extractions remain in accuracy denominators.
+Summary wording, generated IDs and received dates are not scored.
+
+CHAT-001: correct
+CHAT-002: correct
+CHAT-003: correct
+CHAT-004: correct
+CHAT-005: correct
+CHAT-006: correct
+CHAT-007: correct
+CHAT-008: correct
+CHAT-009: correct
+CHAT-010: correct
+CHAT-011: correct
+CHAT-012: correct
+CHAT-013: correct
+CHAT-014: correct
+CHAT-015: correct
+CHAT-016: correct
+CHAT-017: correct
+CHAT-018: correct
+CHAT-019: correct
+CHAT-020: correct
+CHAT-021: correct
+CHAT-022: correct
+CHAT-023: correct
+CHAT-024: correct
+CHAT-025: correct
+
+Token usage: 12,521 input / 5,277 output; 25 model calls
+Estimated token cost (USD): $0.003891
+Average per case, including failures (USD): $0.00015562
+claude-haiku-5-5: $0.10 input / $0.50 output per million tokens; prompts over 100,000: $0.50 / $2.50. Checked 2026-10-31.
+Pricing source: https://platform.claude.com/docs/en/about-claude/pricing
+Standard uncached API response tokens, including failed cases. Excludes discounts, taxes and retries or requests with no recorded response. Older audit logs do not record cache counters; uncached requests are assumed.
+
+---
+
+"model": "claude-haiku-5-5",
+"stage": "final_extraction",
+"max_tokens": 1024,
+"started_at": "2026-10-31T15:30:40.187716+00:00",
+"finished_at": "2026-10-31T15:31:14.930502+00:00",

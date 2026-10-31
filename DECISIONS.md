@@ -32,11 +32,18 @@
   establish that the reasoning is correct.
 
 - **Evaluate triage and extraction separately.** Triage uses 100 fictional
-  enquiries; chatbot extraction uses ten fixed transcripts with one expected
+  enquiries; chatbot extraction uses 25 fixed transcripts with one expected
   final result each. Score the final fields and refusals, with no per-turn checks.
+  Treat all 25 conversations as one evaluation set. Compare two
+  reworded/translated pairs for consistency as well as correctness.
   Keep answer keys out of model input and count failures in the results. Preserve
   earlier reports when code changes. Author review of the keys is still pending.
 
 - **Make the output limit configurable.** Two live replies hit the 1,024-token
   ceiling, so triage now defaults to 2,048 and records the setting in evaluation
   metadata. Truncated replies remain failures, with no automatic retry.
+
+- **Estimate cost from recorded usage.** Include tool turns and failed outputs,
+  save the pricing source/date, and calculate older triage costs from their logs.
+  Missing usage means an unavailable estimate, not a free run. This is an API
+  token estimate, not an invoice; discounts and unrecorded retries are excluded.

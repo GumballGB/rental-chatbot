@@ -6,7 +6,7 @@ extract_enquiry_unit_enquiry function runs once after each transcript ends.
 
 INPUTS
 
-    data/conversations.json   Ten user/assistant transcripts ending in user done.
+    data/conversations.json   25 user/assistant transcripts ending in user done.
     data/ground_truth.json    Separate expected final values, not model input.
 
 Answer-key review: pending; review date to be confirmed. All names, emails and
@@ -25,12 +25,34 @@ CHAT-007  2            Unanswered name/phone questions      none
 CHAT-008  5            Unselected listing and unknown date  budget, phone
 CHAT-009  5            Email correction; unknown budget     phone
 CHAT-010  5            User budget/phone vs assistant data  none
+CHAT-011  2            Applicant vs relative contacts       none
+CHAT-012  2            Previously supplied phone removed    phone
+CHAT-013  2            Previously supplied email removed    email
+CHAT-014  3            Final budget/date among alternatives none
+CHAT-015  2            French/English; phone undecided      none
+CHAT-016  2            Danish/English; phone punctuation    none
+CHAT-017  2            Long message with irrelevant numbers none
+CHAT-018  2            Date ambiguity remains unresolved    none
+CHAT-019  1            General question; no applicant facts none
+CHAT-020  2            Numeric date explicitly clarified    none
+CHAT-021  1            English pair: full sentences         none
+CHAT-022  3            English pair: short text and typos    none
+CHAT-023  2            Language pair: Danish                phone
+CHAT-024  3            Language pair: English               phone
+CHAT-025  2            Selects earlier options by reference none
 
 * User turns exclude the final done command. This is the range of the current
 fixtures, not a new five-turn limit in the interactive chatbot.
 
+All 25 conversations form one evaluation set with one overall score. CHAT-001
+through CHAT-010 are unchanged; CHAT-011 through CHAT-025 extend the same set.
+New expected answers have explanatory notes and are pending author review before
+live scoring; no new live score is claimed. The earlier 10/10 result applies
+only to the first ten conversations, before expansion.
+
 The runner removes done locally and appends the same extraction request used by
 run_rental_chat. Neither case titles nor expected answers reach the model.
+The pair_id and answer notes are also excluded from model input.
 Only the final six fields and final declined_fields set are compared:
 
     name, email, phone, move_in_date, budget, listing_id
@@ -56,6 +78,25 @@ SCORING RULES
   missing supplied value; wrong means a different supplied value.
 - Missing or failed extractions remain in accuracy denominators. No retries are
   performed. The production extractor currently has a 1,024-output-token ceiling.
+- An explicit final request to remove a previously supplied contact, accompanied
+  by refusal to supply that field, leaves null plus that declined_fields entry.
+  This follows the existing latest-correction rule; it does not delete audit data.
+- Ambiguous dates remain null until the user clarifies them. Uncertainty is not
+  an explicit refusal. Alternatives mentioned by the assistant become selected
+  values only when the user actually chooses them.
+
+PAIRED CONSISTENCY
+
+PAIR-EN (CHAT-021/022) expresses the same facts in full English sentences versus
+short, typo-containing messages. PAIR-DK (CHAT-023/024) expresses the same facts
+in Danish versus English. Each pair has the same expected final fields.
+
+The report compares final extracted fields and refusals using the same phone,
+email, Unicode and whitespace normalization as accuracy. It ignores summary
+wording. It shows both consistent pairs and pairs with both outputs correct:
+matching outputs can still both be wrong. A failed/missing extraction makes the
+pair inconsistent. If --limit selects only half a pair, that pair is explicitly
+not evaluated. Paired examples are related cases, not independent scenarios.
 
 RUN
 
@@ -64,8 +105,9 @@ From the repository root with dependencies installed and ANTHROPIC_API_KEY set:
     python -m eval.chatbot.run_eval
     python -m eval.chatbot.run_eval --limit 2
 
-The first command makes ten real extraction calls; the second uses the two short
-complete cases. The assistant responses in the transcripts are not regenerated.
+The full command makes 25 real extraction calls. --limit 2 uses the first two
+short cases. Review the new answer key before running the expanded benchmark.
+The assistant responses in the transcripts are not regenerated.
 Optional --data-dir and --output-dir select fixture and results parent folders.
 
 Each attempt creates output/eval/chatbot/EVALUATION_ID/ with:
@@ -73,11 +115,18 @@ Each attempt creates output/eval/chatbot/EVALUATION_ID/ with:
     conversations.json      The selected input transcripts.
     expected_answers.json   The selected answer-key rows.
     predictions.json        Final extractions or failure reasons, saved per case.
-    metrics.json            Field counts, accuracy and per-conversation mismatches.
-    report.txt              Readable scores and expected/actual differences.
+    usage.json              Per-response token counts, saved before parsing.
+    metrics.json            Field counts, overall score, pair scores, mismatches
+                            and cost estimate.
+    report.txt              Readable scores, differences and cost estimate.
+    cost.json               Token totals, USD estimate and pricing snapshot.
+    cost_report.txt         Readable cost estimate and its limitations.
 
 No runtime Enquiry or pending Review is created. Seed inputs stay unchanged.
 Tests use the fake client and tmp_path, so no API credentials are needed.
+The cost covers final extraction only, including invalid/truncated outputs.
+It does not measure the cost of a live conversation. See ../eval_readme.txt
+for the saved-run cost command, pricing and missing-usage limitations.
 
 This benchmark measures extraction from fixed text. It does not establish that
 the live chatbot asks good questions, uses lookup tools correctly, or produces

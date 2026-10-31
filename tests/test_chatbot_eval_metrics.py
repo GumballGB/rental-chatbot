@@ -123,3 +123,52 @@ def test_report_shows_counts_refusals_and_specific_final_field_errors(monkeypatc
     assert "Invented" in text and "Omitted" in text
     assert "Declined fields exact match: 0/1" in text
     assert "budget: expected 2000, got 1800" in text
+
+
+def test_one_set_of_scores_and_pairs_distinguish_consistency_from_correctness():
+    
+    answers = [expected("O1", name="Original"), *[expected(f"C{i}", name="Sam") for i in range(1, 5)]]
+    conversations = [
+        {"conversation_id": "O1"},
+        *[{"conversation_id": f"C{i}", "pair_id": f"PAIR-{(i + 1) // 2}"} for i in range(1, 5)],
+    ]
+    predictions = [
+        prediction(answers[0]), prediction(answers[1], name="Wrong"),
+        prediction(answers[2], name="Wrong"), prediction(answers[4]),
+    ]
+
+    report = calculate_metrics(answers, predictions, conversations=conversations)
+
+    assert report["total"] == 5
+    assert report["correct"] == 2
+    assert report["accuracy"] == 0.4
+    assert report["failed"] == 1
+    pairs = report["paired_consistency"]
+    assert pairs["total"] == 2
+    assert pairs["consistent"] == 1
+    assert pairs["both_correct"] == 0
+    assert pairs["cases"][0]["consistent"] is True
+    assert pairs["cases"][1]["consistent"] is False
+    text = render_metrics(report)
+    assert "Whole result correct: 2/5" in text
+    assert "Paired consistency: 1/2" in text
+    assert "Pairs with both results correct: 0/2" in text
+
+
+def test_paired_consistency_uses_field_normalization_and_ignores_summary_wording():
+    answers = [expected(f"C{i}", name="Amélie", phone="+1-514-555-0121", declined_fields=["budget", "email"]) for i in (1, 2)]
+    conversations = [{"conversation_id": f"C{i}", "pair_id": "PAIR-1"} for i in (1, 2)]
+    predictions = [
+        prediction(answers[0], message="Summary one."),
+        prediction(answers[1], name="Ame\u0301lie", phone="(514) 555-0121", declined_fields=["email", "budget"], message="Summary two."),
+    ]
+    report = calculate_metrics(answers, predictions, conversations=conversations)
+    assert report["paired_consistency"]["consistent"] == 1
+    assert report["paired_consistency"]["both_correct"] == 1
+
+
+def test_a_limit_cutting_a_pair_in_half_is_not_counted_as_a_consistency_failure():
+    answer = expected("C1", name="Sam")
+    report = calculate_metrics([answer], [prediction(answer)], conversations=[{"conversation_id": "C1", "pair_id": "PAIR-1"}])
+    assert report["paired_consistency"]["total"] == 0
+    assert report["paired_consistency"]["not_evaluated"] == 1

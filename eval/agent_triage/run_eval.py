@@ -15,6 +15,7 @@ from core.store import DATA_DIR, JsonStore
 from core.writer import DEFAULT_OUTPUT_DIR
 from eval.agent_triage.metrics import calculate_metrics
 from eval.agent_triage.report import render_metrics
+from eval.cost import save_cost_report, triage_cost
 
 DEFAULT_EVAL_DIR = DEFAULT_OUTPUT_DIR / "eval" / "agent_triage"
 
@@ -145,6 +146,8 @@ def run_evaluation(
         "finished_at": datetime.now(UTC).isoformat(),
         "data_dir": str(data_dir.resolve()),
     }
+    metrics["cost"] = triage_cost(run_dir, predictions)
+    save_cost_report(run_dir, metrics["cost"])
 
     # Save the metrics and report to the run folder, and show a summary to the user.
     _save_json(run_dir / "metrics.json", metrics)

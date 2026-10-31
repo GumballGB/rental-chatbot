@@ -90,9 +90,11 @@ Every attempt creates a separate folder, so previous reports stay available:
         expected_answers.json  The answer-key rows scored in this attempt.
         predictions.json       Labels, duplicate targets, full recommendations,
                                successful triage run IDs, and failure reasons.
-        metrics.json           Scores plus model name, output-token limit,
-                               timestamps and data path.
-        report.txt             Human-readable confusion matrix and metrics.
+        metrics.json           Scores, cost estimate, model name, output-token
+                               limit, timestamps and data path.
+        report.txt             Human-readable confusion matrix, metrics and cost.
+        cost.json              Token counts, USD estimate and pricing snapshot.
+        cost_report.txt        Readable cost estimate and its limitations.
         audit/0001/<run_id>.jsonl
         audit/0002/<run_id>.jsonl
         ...
@@ -110,6 +112,9 @@ the loop continues. Filesystem errors and keyboard interrupts stop the run.
 
 Evaluation passes output_dir=None to triage: it creates no pending reviews.
 Its audit logs are saved inside the evaluation folder. Seed files are read-only.
+Older completed runs can recover cost estimates with python -m eval.cost followed
+by their folder path; no model calls or rewritten classification results.
+See ../eval_readme.txt for pricing and usage limitations.
 Optional --data-dir and --output-dir arguments override the default folders;
 --output-dir is the parent of the new evaluation folder.
 

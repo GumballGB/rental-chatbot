@@ -1,0 +1,32 @@
+Label accuracy: 96/100 (96.0%)
+
+Confusion matrix (rows=expected, columns=predicted)
+Expected    genuine  needs_info  spam  duplicate  no recommendation
+genuine     26       0           0     1          1
+needs_info  0        23          0     1          0
+spam        0        0           24    0          0
+duplicate   0        0           0     23         1
+
+Per-class metrics
+Label       Support  Predicted  Precision  Recall
+genuine     28       26         100.0%     92.9%
+needs_info  24       23         100.0%     95.8%
+spam        24       24         100.0%     100.0%
+duplicate   24       25         92.0%      95.8%
+
+Duplicate exact outcomes: 23/24 (95.8%)
+
+Failed runs: 2/100
+
+ENQ-048: ValueError: Recommendation failed evidence check: evidence[2] not found in tool results
+ENQ-098: ValidationError: 1 validation error for Recommendation
+evidence.2.quote
+  String should have at least 8 characters [type=string_too_short, input_value='name', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.14/v/string_too_short
+
+---
+
+"model": "claude-haiku-5-5",
+"max_tokens": 2048,
+"started_at": "2026-10-31T14:27:31.801328+00:00",
+"finished_at": "2026-10-31T14:34:10.698616+00:00",

@@ -94,7 +94,9 @@ python main.py
 ```
 
 Enter fictional rental messages and type `done` to extract and save an enquiry.
-Ten fixed conversations now form a separate final-extraction benchmark; live scores are not yet available.
+A separate final-extraction benchmark contains 25 conversations. Before expansion,
+the first ten scored 10/10 in one development run; the 15 additions await
+answer-key review and live evaluation.
 
 The triage API is `triage_enquiry(enquiry, client, data_store, max_tokens=2048)`.
 It returns a `TriageResult` with the generated `run_id` and validated recommendation,
@@ -149,10 +151,12 @@ full procedure and [dataset notes](data/seed_data_README.txt) for case design.
 
 ## Chatbot extraction evaluation
 
-Ten [fixed conversations](eval/chatbot/data/conversations.json) have a separate
-[final-result answer key](eval/chatbot/data/ground_truth.json). Two finish after one
-user turn; others include follow-ups, corrections and declined fields, up to five
-user turns before `done`. Only the final fields and `declined_fields` are scored.
+The 25 [fixed conversations](eval/chatbot/data/conversations.json) have a separate
+[final-result answer key](eval/chatbot/data/ground_truth.json). They include
+follow-ups, corrections, declined fields,
+mixed languages and unrelated details, with up to five user turns before `done`.
+Only the final fields and `declined_fields` are scored across all 25 cases.
+Reports also check two pairs with the same facts expressed differently.
 
 ```bash
 python -m eval.chatbot.run_eval
@@ -162,7 +166,26 @@ python -m eval.chatbot.run_eval --limit 2
 This makes one extraction call per transcript, with fixed assistant replies and no
 per-turn assertions. Reports go to `output/eval/chatbot/EVALUATION_ID/`.
 **Answer-key review: pending; review date to be confirmed.**
+Review the new expected answers before running the expanded benchmark. The earlier
+10/10 extraction result covers the original ten only.
 See the [chatbot guide](eval/chatbot/eval_readme.txt).
+
+## Evaluation cost
+
+Evaluations include token totals, an estimated USD cost and an average per
+case in `metrics.json` and `report.txt`, plus `cost.json` and `cost_report.txt`.
+Estimates include tool turns and failed outputs and save the pricing source/date.
+They use standard API rates, before discounts and taxes.
+
+Recover the cost of a completed triage run, including one started before this change:
+
+```bash
+python -m eval.cost output/eval/agent_triage/EVALUATION_ID
+```
+
+This reads saved logs and writes only the cost sidecars; it makes no API calls.
+Let an evaluation finish first. See the [evaluation guide](eval/eval_readme.txt)
+for missing-usage limits and the older output paths.
 
 ## Checks
 

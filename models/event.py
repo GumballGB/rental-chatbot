@@ -33,6 +33,8 @@ class Event(BaseModel):
     # Specific to model_call events
     tokens_in: int | None = Field(default=None, ge=0)
     tokens_out: int | None = Field(default=None, ge=0)
+    cache_creation_input_tokens: int | None = Field(default=None, ge=0)
+    cache_read_input_tokens: int | None = Field(default=None, ge=0)
 
     # Specific to recommendation events
     recommendation: Recommendation | None = None

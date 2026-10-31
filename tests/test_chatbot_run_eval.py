@@ -9,6 +9,7 @@ from agents.anthropic_functions import EXTRACTION_MAX_TOKENS
 from core.store import JsonStore
 from eval.chatbot.cases import DEFAULT_DATA_DIR, extraction_messages, load_cases
 from eval.chatbot.run_eval import main, run_evaluation
+from eval.cost import saved_run_cost
 from tests.fakes import FakeAnthropicClient, text_response
 
 
@@ -21,16 +22,23 @@ def cases_dir(tmp_path):
     return data_dir
 
 
-def response_for(answer):
-    return text_response(json.dumps({**answer["expected"], "message": "A fictional rental request."}, ensure_ascii=False))
+def response_for(answer, **usage):
+    return text_response(json.dumps({**answer["expected"], "message": "A fictional rental request."}, ensure_ascii=False), **usage)
 
 
-def test_ten_cases_include_immediate_done_five_turns_and_declines():
+def test_twenty_five_cases_form_one_benchmark_with_two_consistency_pairs():
     conversations, answers = load_cases()
     counts = [(len(case["messages"]) - 1) // 2 for case in conversations]
     store = JsonStore()
 
-    assert len(conversations) == len(answers) == 10
+    assert len(conversations) == len(answers) == 25
+    assert [case["conversation_id"] for case in conversations[:10]] == [f"CHAT-{i:03d}" for i in range(1, 11)]
+    pairs = {}
+    for case in conversations:
+        if "pair_id" in case:
+            pairs.setdefault(case["pair_id"], []).append(case["conversation_id"])
+    assert len(pairs) == 2
+    assert all(len(ids) == 2 for ids in pairs.values())
     assert counts[:2] == [1, 1]
     assert min(counts) == 1 and max(counts) == 5
     assert counts.count(5) >= 3
@@ -49,32 +57,60 @@ def test_extracts_once_per_full_transcript_without_sending_done_or_answers(cases
     for answer in answers:
         answer["notes"] = "EXPECTED ANSWERS ONLY"
     key_path.write_text(json.dumps(answers), encoding="utf-8")
-    client = FakeAnthropicClient([response_for(answer) for answer in answers])
+    client = FakeAnthropicClient([response_for(answer, input_tokens=1000, output_tokens=200) for answer in answers])
 
     run_dir = run_evaluation(client, cases_dir, tmp_path / "output", show=lambda _: None)
 
-    assert len(client.messages.calls) == 10
+    assert len(client.messages.calls) == len(conversations)
     for call, conversation in zip(client.messages.calls, conversations):
         assert call["messages"] == extraction_messages(conversation)
         assert all(message["content"].strip().lower() != "done" for message in call["messages"])
         assert call["max_tokens"] == EXTRACTION_MAX_TOKENS
         assert "EXPECTED ANSWERS ONLY" not in json.dumps(call)
         assert conversation["title"] not in json.dumps(call)
+        if "pair_id" in conversation:
+            assert conversation["pair_id"] not in json.dumps(call)
     metrics = json.loads((run_dir / "metrics.json").read_text(encoding="utf-8"))
-    assert metrics["correct"] == metrics["total"] == 10
+    assert metrics["correct"] == metrics["total"] == len(conversations)
     assert metrics["failed"] == 0
     assert metrics["metadata"]["max_tokens"] == EXTRACTION_MAX_TOKENS
-    assert "Whole result correct: 10/10" in (run_dir / "report.txt").read_text(encoding="utf-8")
+    assert metrics["cost"]["estimated_cost_usd"] == pytest.approx(len(conversations) * 0.0002)
+    assert metrics["cost"]["model_calls"] == len(conversations)
+    assert metrics["cost"] == saved_run_cost(run_dir)
+    assert f"Estimated token cost (USD): ${len(conversations) * 0.0002:.6f}" in (run_dir / "report.txt").read_text(encoding="utf-8")
+    usage = json.loads((run_dir / "usage.json").read_text(encoding="utf-8"))
+    assert [row["conversation_id"] for row in usage] == [case["conversation_id"] for case in conversations]
+    assert f"Whole result correct: {len(conversations)}/{len(conversations)}" in (run_dir / "report.txt").read_text(encoding="utf-8")
+    assert metrics["paired_consistency"]["consistent"] == metrics["paired_consistency"]["both_correct"] == 2
     assert not list(run_dir.rglob("reviews"))
     assert not list(run_dir.rglob("enquiries"))
     assert (cases_dir / "conversations.json").read_bytes() == original_files["conversations.json"]
     assert json.loads(key_path.read_text(encoding="utf-8")) == answers
 
 
+@pytest.mark.parametrize("problem", ["blank_pair", "missing_pair_member", "different_pair_answers"])
+def test_bad_pair_metadata_fails_before_requests(cases_dir, tmp_path, problem):
+    conversations, answers = load_cases(cases_dir)
+    if problem == "blank_pair":
+        conversations[-1]["pair_id"] = " "
+    elif problem == "missing_pair_member":
+        del conversations[20]["pair_id"]
+    else:
+        answers[20]["expected"]["budget"] = 2400
+    for filename, records in (("conversations.json", conversations), ("ground_truth.json", answers)):
+        (cases_dir / filename).write_text(json.dumps(records), encoding="utf-8")
+    client = FakeAnthropicClient([])
+    with pytest.raises(ValueError):
+        run_evaluation(client, cases_dir, tmp_path / "output", show=lambda _: None)
+    assert not client.messages.calls
+    assert not (tmp_path / "output").exists()
+
+
 def test_failed_extraction_is_saved_and_the_next_case_runs(cases_dir, tmp_path):
     _, answers = load_cases(cases_dir)
     client = FakeAnthropicClient([
-        text_response("partial", stop_reason="max_tokens"), response_for(answers[1]),
+        text_response("partial", stop_reason="max_tokens", input_tokens=1000, output_tokens=1024),
+        response_for(answers[1], input_tokens=1000, output_tokens=200),
     ])
 
     run_dir = run_evaluation(client, cases_dir, tmp_path / "output", limit=2, show=lambda _: None)
@@ -85,6 +121,25 @@ def test_failed_extraction_is_saved_and_the_next_case_runs(cases_dir, tmp_path):
     assert report["accuracy"] == 0.5
     assert "max_tokens" in report["failures"][0]["error"]
     assert len(client.messages.calls) == 2
+    assert report["cost"]["estimated_cost_usd"] == pytest.approx(0.000812)
+    assert report["cost"] == saved_run_cost(run_dir)
+
+
+def test_failed_request_without_a_response_is_not_reported_as_free(cases_dir, tmp_path):
+    run_dir = run_evaluation(FakeAnthropicClient([]), cases_dir, tmp_path / "output", limit=1, show=lambda _: None)
+    report = json.loads((run_dir / "metrics.json").read_text(encoding="utf-8"))
+    assert report["failed"] == 1
+    assert report["cost"]["estimated_cost_usd"] is None
+    assert "CHAT-001" in " ".join(report["cost"]["warnings"])
+    assert report["cost"] == saved_run_cost(run_dir)
+
+
+def test_invalid_extraction_json_still_has_a_token_cost(cases_dir, tmp_path):
+    client = FakeAnthropicClient([text_response("not JSON", input_tokens=1000, output_tokens=200)])
+    run_dir = run_evaluation(client, cases_dir, tmp_path / "output", limit=1, show=lambda _: None)
+    report = json.loads((run_dir / "metrics.json").read_text(encoding="utf-8"))
+    assert report["failed"] == 1
+    assert report["cost"]["estimated_cost_usd"] == pytest.approx(0.0002)
 
 
 @pytest.mark.parametrize("problem", ["duplicate", "missing_answer", "unknown_field", "declined_value", "early_done", "no_done", "bad_role"])
@@ -135,6 +190,8 @@ def test_cli_uses_the_fake_client_and_selected_limit(cases_dir, tmp_path, monkey
 
     assert len(client.messages.calls) == 1
     assert len(list((tmp_path / "output").glob("*/report.txt"))) == 1
+    path = next((tmp_path / "output").glob("*/predictions.json"))
+    assert json.loads(path.read_text(encoding="utf-8"))[0]["conversation_id"] == "CHAT-001"
 
 
 @pytest.mark.parametrize("limit", [0, -1])
