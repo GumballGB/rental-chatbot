@@ -7,25 +7,28 @@ and proposing classifications with evidence, audit records and a human decision.
 The examples use fictional people and inventory in the Montréal region and Copenhagen,
 with English, French and Danish messages. This classifies enquiries, not tenant eligibility.
 
-## Triage development results
+## Evaluation results
 
 Live model calls on synthetic data. **Answer-key review: pending; review date to be confirmed.**
 
-| Run | Correct labels | Failed runs | Exact duplicate targets |
-|---|---:|---:|---:|
-| [47-case pilot](results/eval_1/report.txt) | 46/47 (97.9%) | 1/47 | 8/8 |
-| [100-case run 1](results/eval_2/report.txt) | 99/100 (99.0%) | 0/100 | 24/24 |
-| [100-case run 2](results/eval_3/report.txt) | 96/100 (96.0%) | 2/100 | 23/24 |
+| Evaluation | Archived runs | Correct across runs | Per-run accuracy range | Failed cases |
+|---|---|---:|---:|---:|
+| [Agent triage](results/official_runs/agent_triage/) | `eval_4`–`eval_9`: 100 enquiries each | 580/600 (96.7%) | 95–98% | 8/600 |
+| [Chatbot final extraction](results/official_runs/chatbot/) | `eval_10`–`eval_15`: 25 conversations each | 147/150 (98.0%) | 92–100% | 0/150 |
 
-Failures remain in the accuracy denominator. These development runs used a 1,024-token
-output ceiling; the current default is 2,048. The pilot also predates the initial-letter
-quote-matching adjustment. See [archive provenance](results/README.md) for settings and
-original run IDs. These are not final repeatability results or real-user measurements.
+These reports are dated 2026-10-31 and record `claude-haiku-5-5`, with output ceilings
+of 2,048 tokens for triage and 1,024 for extraction. Failures remain in the accuracy
+denominator. Repeated runs use the same synthetic cases; these totals are predictions
+on 100 enquiries and 25 conversations, respectively, not additional unique examples.
 
-![Confusion matrix for the second 100-case development run](results/eval_3/confusion_matrix.png)
+See the [results index](results/README.md) for every run's scores, reports, cost
+estimates and triage heatmaps. Earlier development runs `eval_1`–`eval_3` are
+preserved in [past_runs](results/past_runs/) and used a 1,024-token triage ceiling.
 
-*Latest archived run: 100 enquiries, 96 correct labels and two truncated outputs.
-Two accepted false duplicate labels involved candidates matching only listing and date.*
+![Confusion matrix for triage eval_9](results/official_runs/agent_triage/eval_9/confusion_matrix.png)
+
+*Triage `eval_9`: 97/100 correct labels, one evidence-check failure and 24/24 exact
+duplicate outcomes. See its [report](results/official_runs/agent_triage/eval_9/report.txt).*
 
 ## Workflow
 
@@ -50,8 +53,9 @@ flowchart TD
     Key["Separate answer key"] --> Metrics
 ```
 
-`main.py` runs conversation and extraction. The application separately calls
-`triage_enquiry`; human review is another terminal operation. Evaluation uses the
+`main.py` runs conversation, extraction and guarded triage, then opens the human
+review queue in the same session. Use `--queue-only` to defer human review and run
+the review command separately. Evaluation uses the
 same guarded triage path and bypasses pending reviews to score original outputs.
 
 ## Governance controls
@@ -93,10 +97,21 @@ automated tests use fake clients and need no API key. Linux may require `python3
 python main.py
 ```
 
-Enter fictional rental messages and type `done` to extract and save an enquiry.
-A separate final-extraction benchmark contains 25 conversations. Before expansion,
-the first ten scored 10/10 in one development run; the 15 additions await
-answer-key review and live evaluation.
+Enter fictional rental messages and type `done` to extract and save an enquiry,
+automatically run triage, and open its recommendation for human review. The
+recommendation remains pending until a reviewer approves or overrides it.
+If triage fails, the enquiry stays saved and the command reports the failure;
+no pending review is created for a rejected model output.
+
+The review queue includes all pending reviews from earlier sessions too.
+To defer human review until later:
+
+```bash
+python main.py --queue-only
+```
+
+A separate final-extraction benchmark contains 25 conversations. Its six archived
+live runs are summarized above; answer-key review remains pending.
 
 The triage API is `triage_enquiry(enquiry, client, data_store, max_tokens=2048)`.
 It returns a `TriageResult` with the generated `run_id` and validated recommendation,
@@ -144,10 +159,26 @@ Plots read saved results and make no model calls. PNG is the default; `--output 
 or `--output matrix.svg` exports a vector figure. PR/ROC curves require prediction scores
 that the current outputs do not supply.
 
-For 3–5 repeated full runs, freeze the reviewed key, code, model and settings. Preserve
-all results and report per-run values, mean, range and failures. These are repeated
-predictions on 100 known cases. See the [evaluation guide](eval/eval_readme.txt) for the
-full procedure and [dataset notes](data/seed_data_README.txt) for case design.
+The committed archives use this layout:
+
+```text
+results/
+├── README.md                         # Per-run scores, links and provenance
+├── past_runs/eval_1..eval_3/           # Earlier triage reports and heatmaps
+└── official_runs/
+    ├── agent_triage/eval_4..eval_9/    # Reports, cost reports and heatmaps
+    └── chatbot/eval_10..eval_15/       # Extraction reports and cost reports
+```
+
+New evaluations still write to `output/eval/`; archiving selected artifacts under
+`results/` is a separate step. The archives contain readable reports and figures,
+with triage audit logs also included for `eval_8`. Full machine-readable outputs
+are not included in these archives.
+
+For future repeated full runs, freeze the reviewed key, code, model and settings.
+Preserve all results and report per-run values, mean, range and failures. See the
+[evaluation guide](eval/eval_readme.txt) for the procedure and
+[dataset notes](data/seed_data_README.txt) for case design.
 
 ## Chatbot extraction evaluation
 
@@ -166,8 +197,9 @@ python -m eval.chatbot.run_eval --limit 2
 This makes one extraction call per transcript, with fixed assistant replies and no
 per-turn assertions. Reports go to `output/eval/chatbot/EVALUATION_ID/`.
 **Answer-key review: pending; review date to be confirmed.**
-Review the new expected answers before running the expanded benchmark. The earlier
-10/10 extraction result covers the original ten only.
+The archived `eval_10`–`eval_15` reports cover all 25 conversations. They measure
+final extraction from fixed transcripts; they do not score live follow-up questions
+or the complete chat-to-human-review workflow.
 See the [chatbot guide](eval/chatbot/eval_readme.txt).
 
 ## Evaluation cost
