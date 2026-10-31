@@ -1,0 +1,131 @@
+[
+  {
+    "conversation_id": "CHAT-001",
+    "expected": {
+      "name": "Avery Martin",
+      "email": "avery.martin.chat@example.com",
+      "phone": "+1-514-555-0201",
+      "move_in_date": "2027-03-01",
+      "budget": 1850,
+      "listing_id": "LST-037",
+      "declined_fields": []
+    }
+  },
+  {
+    "conversation_id": "CHAT-002",
+    "expected": {
+      "name": "Ida Møller",
+      "email": "ida.moeller.chat@example.com",
+      "phone": "+45 64 74 84 94",
+      "move_in_date": "2027-04-01",
+      "budget": 10500,
+      "listing_id": "LST-105",
+      "declined_fields": []
+    }
+  },
+  {
+    "conversation_id": "CHAT-003",
+    "expected": {
+      "name": "Lena Dumont",
+      "email": "lena.dumont.chat@example.com",
+      "phone": "+1-514-555-0203",
+      "move_in_date": "2026-12-01",
+      "budget": 2100,
+      "listing_id": "LST-002",
+      "declined_fields": []
+    }
+  },
+  {
+    "conversation_id": "CHAT-004",
+    "expected": {
+      "name": "Samir Haddad",
+      "email": "samir.new.chat@example.com",
+      "phone": "+1-514-555-0204",
+      "move_in_date": "2027-04-01",
+      "budget": 2700,
+      "listing_id": "LST-034",
+      "declined_fields": []
+    }
+  },
+  {
+    "conversation_id": "CHAT-005",
+    "expected": {
+      "name": "Chloé Fortin",
+      "email": "chloe.fortin.chat@example.com",
+      "phone": null,
+      "move_in_date": "2027-03-01",
+      "budget": 1850,
+      "listing_id": "LST-037",
+      "declined_fields": [
+        "phone"
+      ]
+    }
+  },
+  {
+    "conversation_id": "CHAT-006",
+    "expected": {
+      "name": "Mikkel Nørgaard",
+      "email": null,
+      "phone": "+45 65 75 85 95",
+      "move_in_date": "2027-05-01",
+      "budget": 8500,
+      "listing_id": "LST-120",
+      "declined_fields": [
+        "email"
+      ]
+    }
+  },
+  {
+    "conversation_id": "CHAT-007",
+    "expected": {
+      "name": null,
+      "email": "unnamed.chat@example.com",
+      "phone": null,
+      "move_in_date": "2026-11-01",
+      "budget": 1600,
+      "listing_id": "LST-001",
+      "declined_fields": []
+    }
+  },
+  {
+    "conversation_id": "CHAT-008",
+    "expected": {
+      "name": "Émile Beaulieu",
+      "email": "emile.beaulieu.chat@example.com",
+      "phone": null,
+      "move_in_date": null,
+      "budget": null,
+      "listing_id": null,
+      "declined_fields": [
+        "budget",
+        "phone"
+      ]
+    }
+  },
+  {
+    "conversation_id": "CHAT-009",
+    "expected": {
+      "name": "Klara Bæk",
+      "email": "klara.new.chat@example.com",
+      "phone": null,
+      "move_in_date": "2027-01-01",
+      "budget": null,
+      "listing_id": "LST-137",
+      "declined_fields": [
+        "phone"
+      ]
+    }
+  },
+  {
+    "conversation_id": "CHAT-010",
+    "expected": {
+      "name": "Lina Moreau",
+      "email": "lina.moreau.chat@example.com",
+      "phone": "+1-514-555-0210",
+      "move_in_date": "2027-03-01",
+      "budget": 2000,
+      "listing_id": "LST-037",
+      "declined_fields": []
+    }
+  }
+]

@@ -21,6 +21,7 @@ Rules:
 - Include all fields.
 - Use null for missing information.
 - budget must be an integer or null.
+- move_in_date must use YYYY-MM-DD, or null when no unambiguous date is supplied.
 - declined_fields must be an array of field names that
   the user has explicitly refused to provide.
 - Try to find the desired listing name or building name of the enquiry
@@ -45,6 +46,7 @@ The user may decline some information, and you should track which fields are dec
 """
 
 MODEL = "claude-haiku-5-5"
+EXTRACTION_MAX_TOKENS = 1024
 
 # For formal reasons, I created a redundant function.
 def boot_anthropic():
@@ -123,7 +125,7 @@ def extract_enquiry_unit_enquiry(messages, client):
 
     # Send the messages to the model to get a response for the unit enquiry.
     response = client.messages.create(
-        max_tokens=1024,
+        max_tokens=EXTRACTION_MAX_TOKENS,
         system=SYSTEM_PROMPT,
         messages=messages,
         model=MODEL,

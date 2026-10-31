@@ -13,10 +13,10 @@ from agents.agent_triage import DEFAULT_TRIAGE_MAX_TOKENS, triage_enquiry
 from agents.anthropic_functions import MODEL, boot_anthropic
 from core.store import DATA_DIR, JsonStore
 from core.writer import DEFAULT_OUTPUT_DIR
-from eval.metrics import calculate_metrics
-from eval.report import render_metrics
+from eval.agent_triage.metrics import calculate_metrics
+from eval.agent_triage.report import render_metrics
 
-DEFAULT_EVAL_DIR = DEFAULT_OUTPUT_DIR / "eval"
+DEFAULT_EVAL_DIR = DEFAULT_OUTPUT_DIR / "eval" / "agent_triage"
 
 
 def _save_json(path: Path, contents) -> None:

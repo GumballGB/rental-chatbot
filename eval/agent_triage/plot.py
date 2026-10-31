@@ -8,7 +8,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator, PercentFormatter
 
-from eval.metrics import LABELS, NO_RECOMMENDATION
+from eval.agent_triage.metrics import LABELS, NO_RECOMMENDATION
 
 
 def plot_confusion_matrix(report: dict, *, normalize: bool = False) -> Figure:

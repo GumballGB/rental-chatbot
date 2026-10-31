@@ -1,0 +1,390 @@
+[
+  {
+    "conversation_id": "CHAT-001",
+    "title": "Complete English enquiry, then done",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I'm Avery Martin. I choose LST-037 in Verdun, with a maximum budget of 1,850 CAD and a move-in date of 2027-03-01. Email avery.martin.chat@example.com or call +1 514 555 0201. Can we arrange a viewing?"
+      },
+      {
+        "role": "assistant",
+        "content": "Thank you. I have the selected listing, timing, budget and your contact details."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-002",
+    "title": "Complete Danish enquiry, then done",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hej, jeg hedder Ida Møller. Jeg vælger LST-105 på Amagerbro og vil flytte ind den 1. april 2027. Mit maksimale budget er 10.500 DKK. Min e-mail er ida.moeller.chat@example.com, og mit telefonnummer er +45 64 74 84 94. Kan vi aftale en fremvisning?"
+      },
+      {
+        "role": "assistant",
+        "content": "Tak. Jeg har dine oplysninger og dit valg af lejlighed."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-003",
+    "title": "Information supplied across three turns",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I'm looking for a one-bedroom in Griffintown."
+      },
+      {
+        "role": "assistant",
+        "content": "LST-002 is a one-bedroom listed at 1,895 CAD. Would you like that listing, and what are your budget and timing?"
+      },
+      {
+        "role": "user",
+        "content": "I choose LST-002. My maximum is 2,100 CAD and I want to move on December 1, 2026."
+      },
+      {
+        "role": "assistant",
+        "content": "What name and contact details should I use?"
+      },
+      {
+        "role": "user",
+        "content": "My name is Lena Dumont. My email is lena.dumont.chat@example.com and my phone is +1 514 555 0203."
+      },
+      {
+        "role": "assistant",
+        "content": "Thank you. I have the information for your enquiry."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-004",
+    "title": "Five turns with corrected budget, date and email",
+    "messages": [
+      {
+        "role": "user",
+        "content": "My name is Samir Haddad and my email is samir.old.chat@example.com."
+      },
+      {
+        "role": "assistant",
+        "content": "Which listing are you interested in, and when would you like to move?"
+      },
+      {
+        "role": "user",
+        "content": "LST-034 in Verdun. My maximum is 2,400 CAD and I would move on March 1, 2027."
+      },
+      {
+        "role": "assistant",
+        "content": "Would you like to add anything or change those details?"
+      },
+      {
+        "role": "user",
+        "content": "Actually, change my maximum budget to 2,700 CAD and the move-in date to April 1, 2027."
+      },
+      {
+        "role": "assistant",
+        "content": "I will use the updated budget and date. Is the email still correct?"
+      },
+      {
+        "role": "user",
+        "content": "No. Use samir.new.chat@example.com instead of the old email."
+      },
+      {
+        "role": "assistant",
+        "content": "Would you like to provide a phone number?"
+      },
+      {
+        "role": "user",
+        "content": "Yes, +1 514 555 0204. Those are my final details."
+      },
+      {
+        "role": "assistant",
+        "content": "Thank you for confirming."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-005",
+    "title": "Five French turns with phone declined",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Je m'appelle Chloé Fortin. Je cherche un une-chambre à Verdun."
+      },
+      {
+        "role": "assistant",
+        "content": "LST-037 est un une-chambre annoncé à 1 655 CAD. Souhaitez-vous le choisir?"
+      },
+      {
+        "role": "user",
+        "content": "Oui, je choisis LST-037 pour le 1er mars 2027."
+      },
+      {
+        "role": "assistant",
+        "content": "Quel est votre budget maximal et comment vous contacter?"
+      },
+      {
+        "role": "user",
+        "content": "Mon maximum est de 1 850 CAD. Mon courriel est chloe.fortin.chat@example.com."
+      },
+      {
+        "role": "assistant",
+        "content": "Souhaitez-vous aussi fournir un numéro de téléphone?"
+      },
+      {
+        "role": "user",
+        "content": "Je ne souhaite pas donner mon numéro de téléphone."
+      },
+      {
+        "role": "assistant",
+        "content": "Je note votre refus. Le courriel convient-il pour la visite?"
+      },
+      {
+        "role": "user",
+        "content": "Oui, merci de me contacter par courriel pour organiser la visite."
+      },
+      {
+        "role": "assistant",
+        "content": "Merci, les renseignements sont notés."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-006",
+    "title": "Four Danish turns with email declined",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hej, jeg hedder Mikkel Nørgaard og søger en studiolejlighed i Valby."
+      },
+      {
+        "role": "assistant",
+        "content": "LST-120 er en studiolejlighed til 7.600 DKK. Vil du vælge den?"
+      },
+      {
+        "role": "user",
+        "content": "Ja, jeg vælger LST-120 fra 1. maj 2027. Mit maksimale budget er 8.500 DKK."
+      },
+      {
+        "role": "assistant",
+        "content": "Hvilket telefonnummer kan vi bruge?"
+      },
+      {
+        "role": "user",
+        "content": "Mit nummer er +45 65 75 85 95."
+      },
+      {
+        "role": "assistant",
+        "content": "Vil du også oplyse en e-mailadresse?"
+      },
+      {
+        "role": "user",
+        "content": "Jeg ønsker ikke at oplyse min e-mailadresse. Ring til mig."
+      },
+      {
+        "role": "assistant",
+        "content": "Det er noteret. Vi bruger telefonen."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-007",
+    "title": "Unanswered name and phone questions are not refusals",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I am interested in LST-001 from November 1, 2026, with a maximum budget of 1,600 CAD."
+      },
+      {
+        "role": "assistant",
+        "content": "How can I contact you?"
+      },
+      {
+        "role": "user",
+        "content": "My email is unnamed.chat@example.com."
+      },
+      {
+        "role": "assistant",
+        "content": "What is your name, and would you like to provide a phone number?"
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-008",
+    "title": "Five French turns: budget and phone declined, date unknown",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Je m'appelle Émile Beaulieu et je cherche un logement à Montréal."
+      },
+      {
+        "role": "assistant",
+        "content": "LST-037 et LST-041 sont des options. Souhaitez-vous choisir un logement?"
+      },
+      {
+        "role": "user",
+        "content": "Non, je ne sélectionne aucun logement pour le moment."
+      },
+      {
+        "role": "assistant",
+        "content": "Quel courriel pouvons-nous utiliser?"
+      },
+      {
+        "role": "user",
+        "content": "Mon courriel est emile.beaulieu.chat@example.com."
+      },
+      {
+        "role": "assistant",
+        "content": "Pouvez-vous donner un budget et un numéro de téléphone?"
+      },
+      {
+        "role": "user",
+        "content": "Je préfère ne pas indiquer mon budget ni mon numéro de téléphone."
+      },
+      {
+        "role": "assistant",
+        "content": "Je le note. Avez-vous une date de déménagement?"
+      },
+      {
+        "role": "user",
+        "content": "Je ne sais pas encore quand déménager."
+      },
+      {
+        "role": "assistant",
+        "content": "Merci. La date reste à déterminer."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-009",
+    "title": "Five Danish turns: corrected email, unknown budget, phone declined",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hej, jeg hedder Klara Bæk og søger et soveværelse i Islands Brygge."
+      },
+      {
+        "role": "assistant",
+        "content": "LST-137 har et soveværelse og er annonceret til 10.300 DKK. Vil du vælge den?"
+      },
+      {
+        "role": "user",
+        "content": "Ja, jeg vælger LST-137 og vil flytte ind den 1. januar 2027."
+      },
+      {
+        "role": "assistant",
+        "content": "Hvilken e-mailadresse skal vi bruge?"
+      },
+      {
+        "role": "user",
+        "content": "klara.old.chat@example.com."
+      },
+      {
+        "role": "assistant",
+        "content": "Er adressen korrekt?"
+      },
+      {
+        "role": "user",
+        "content": "Ret den til klara.new.chat@example.com. Den gamle adresse skal ikke bruges."
+      },
+      {
+        "role": "assistant",
+        "content": "Hvad er dit maksimale budget, og vil du oplyse et telefonnummer?"
+      },
+      {
+        "role": "user",
+        "content": "Mit budget er endnu ikke afklaret. Jeg ønsker ikke at oplyse mit telefonnummer."
+      },
+      {
+        "role": "assistant",
+        "content": "Tak. Budgettet er ukendt, og telefon er fravalgt."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  },
+  {
+    "conversation_id": "CHAT-010",
+    "title": "Five turns: distinguish user values from assistant details",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I'm Lina Moreau and I want a one-bedroom in Verdun."
+      },
+      {
+        "role": "assistant",
+        "content": "LST-037 is listed at 1,655 CAD. For this fictional viewing example, the office contact number is +1 514 555 0299. Which listing and maximum budget should I note for you?"
+      },
+      {
+        "role": "user",
+        "content": "I choose LST-037. My maximum budget is 2,000 CAD."
+      },
+      {
+        "role": "assistant",
+        "content": "What email should I use?"
+      },
+      {
+        "role": "user",
+        "content": "lina.moreau.chat@example.com."
+      },
+      {
+        "role": "assistant",
+        "content": "What date would you like to move?"
+      },
+      {
+        "role": "user",
+        "content": "March 1, 2027."
+      },
+      {
+        "role": "assistant",
+        "content": "What is your own phone number?"
+      },
+      {
+        "role": "user",
+        "content": "My phone number is +1 514 555 0210."
+      },
+      {
+        "role": "assistant",
+        "content": "Thank you. I have your details."
+      },
+      {
+        "role": "user",
+        "content": "done"
+      }
+    ]
+  }
+]

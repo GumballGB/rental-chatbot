@@ -138,6 +138,7 @@ def test_extract_unit_enquiry_accepts_fake_client():
     assert enquiry.name == "Sam"
     assert enquiry.listing_id == "LST-002"
     assert declined_fields == {"phone"}
+    assert "YYYY-MM-DD" in client.messages.calls[0]["system"]
 
 
 def test_run_tool_loop_reports_model_and_tool_events_in_order():

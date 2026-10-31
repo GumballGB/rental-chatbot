@@ -5,8 +5,8 @@ from copy import deepcopy
 
 import pytest
 
-from eval.metrics import calculate_metrics
-from eval.plot import main, plot_confusion_matrix
+from eval.agent_triage.metrics import calculate_metrics
+from eval.agent_triage.plot import main, plot_confusion_matrix
 
 
 @pytest.fixture

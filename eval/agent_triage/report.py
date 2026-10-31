@@ -1,6 +1,6 @@
 """Render evaluation metrics as a readable text report."""
 
-from eval.metrics import LABELS, NO_RECOMMENDATION
+from eval.agent_triage.metrics import LABELS, NO_RECOMMENDATION
 
 
 def _percentage(value: float | None) -> str:

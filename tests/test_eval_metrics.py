@@ -5,8 +5,8 @@ from copy import deepcopy
 
 import pytest
 
-from eval.metrics import calculate_metrics
-from eval.report import render_metrics
+from eval.agent_triage.metrics import calculate_metrics
+from eval.agent_triage.report import render_metrics
 
 
 @pytest.fixture

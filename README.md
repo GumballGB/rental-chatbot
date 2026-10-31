@@ -1,3 +1,5 @@
+![CI](https://github.com/GumballGB/rental-chatbot/actions/workflows/ci.yml/badge.svg)
+
 # Rental chatbot with human-reviewed triage
 
 A Python prototype for collecting rental enquiries, extracting structured fields,
@@ -5,9 +7,9 @@ and proposing classifications with evidence, audit records and a human decision.
 The examples use fictional people and inventory in the Montréal region and Copenhagen,
 with English, French and Danish messages. This classifies enquiries, not tenant eligibility.
 
-## Development results
+## Triage development results
 
-Live model calls on synthetic data. **Full author review of the answer key is pending.**
+Live model calls on synthetic data. **Answer-key review: pending; review date to be confirmed.**
 
 | Run | Correct labels | Failed runs | Exact duplicate targets |
 |---|---:|---:|---:|
@@ -62,7 +64,7 @@ same guarded triage path and bypasses pending reviews to score original outputs.
 | Human decision record | Pending reviews link enquiry and run; approve/override validators and write-once decided reviews. | Single-reviewer workflow; no concurrent-write locking. |
 | Audit trail | Run IDs link model/tool events, token usage, guards and outcomes. | Human decisions are saved as Review files, not their own Event type. |
 | File integrity | Same-directory atomic replacement; pending review saved after both bodies. | Atomic per file, not a transaction across the three files. |
-| Evaluation accountability | Separate answer key, per-class counts, explicit failures and duplicate-target scoring. | Synthetic cases informed development; answer-key review is pending. |
+| Evaluation accountability | Separate answer key, per-class counts, explicit failures and duplicate-target scoring. | Synthetic cases informed development; answer-key review: pending; review date to be confirmed. |
 
 Reviewers see the original enquiry and a note explaining redacted evidence quotes.
 Unknown names, short/lowercase partial names and unsupported contact formats can remain;
@@ -92,7 +94,7 @@ python main.py
 ```
 
 Enter fictional rental messages and type `done` to extract and save an enquiry.
-A live chatbot-extraction benchmark is planned; its accuracy has not been measured.
+Ten fixed conversations now form a separate final-extraction benchmark; live scores are not yet available.
 
 The triage API is `triage_enquiry(enquiry, client, data_store, max_tokens=2048)`.
 It returns a `TriageResult` with the generated `run_id` and validated recommendation,
@@ -120,11 +122,11 @@ are retained alongside 53 challenge cases. Review status is stated above; struct
 Python checks do not establish that every draft label is semantically correct.
 
 ```bash
-python -m eval.run_eval --max-tokens 2048
-python -m eval.run_eval --ids ENQ-001,ENQ-004,ENQ-011,ENQ-012 --max-tokens 2048
+python -m eval.agent_triage.run_eval --max-tokens 2048
+python -m eval.agent_triage.run_eval --ids ENQ-001,ENQ-004,ENQ-011,ENQ-012 --max-tokens 2048
 ```
 
-Each attempt gets a unique `output/eval/EVALUATION_ID/` folder with predictions,
+Each attempt gets a unique `output/eval/agent_triage/EVALUATION_ID/` folder with predictions,
 metrics, a text report, selected answers and audit logs. Truncation remains a failed
 case with no automatic retry. `metrics.json` records the output-token ceiling.
 Evaluation creates no pending reviews; duplicate labels and targets are scored separately.
@@ -132,8 +134,8 @@ Evaluation creates no pending reviews; duplicate labels and targets are scored s
 Replace `EVALUATION_ID` with the folder printed by the runner:
 
 ```bash
-python -m eval.plot output/eval/EVALUATION_ID/metrics.json
-python -m eval.plot output/eval/EVALUATION_ID/metrics.json --normalize
+python -m eval.agent_triage.plot output/eval/agent_triage/EVALUATION_ID/metrics.json
+python -m eval.agent_triage.plot output/eval/agent_triage/EVALUATION_ID/metrics.json --normalize
 ```
 
 Plots read saved results and make no model calls. PNG is the default; `--output matrix.pdf`
@@ -144,6 +146,23 @@ For 3–5 repeated full runs, freeze the reviewed key, code, model and settings.
 all results and report per-run values, mean, range and failures. These are repeated
 predictions on 100 known cases. See the [evaluation guide](eval/eval_readme.txt) for the
 full procedure and [dataset notes](data/seed_data_README.txt) for case design.
+
+## Chatbot extraction evaluation
+
+Ten [fixed conversations](eval/chatbot/data/conversations.json) have a separate
+[final-result answer key](eval/chatbot/data/ground_truth.json). Two finish after one
+user turn; others include follow-ups, corrections and declined fields, up to five
+user turns before `done`. Only the final fields and `declined_fields` are scored.
+
+```bash
+python -m eval.chatbot.run_eval
+python -m eval.chatbot.run_eval --limit 2
+```
+
+This makes one extraction call per transcript, with fixed assistant replies and no
+per-turn assertions. Reports go to `output/eval/chatbot/EVALUATION_ID/`.
+**Answer-key review: pending; review date to be confirmed.**
+See the [chatbot guide](eval/chatbot/eval_readme.txt).
 
 ## Checks
 

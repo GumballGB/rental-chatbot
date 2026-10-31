@@ -1,10 +1,10 @@
-"""Exercise evaluation with real triage code and scripted model responses."""
+# Exercise evaluation with real triage code and scripted model responses.
 
 import json
 
 import pytest
 
-from eval.run_eval import main, run_evaluation
+from eval.agent_triage.run_eval import main, run_evaluation
 from tests.fakes import FakeAnthropicClient, text_response, tool_use_response
 
 
@@ -233,15 +233,15 @@ def test_filesystem_errors_are_not_scored_as_model_failures(eval_data, tmp_path,
     def cannot_write(*args, **kwargs):
         raise OSError("Disk full")
 
-    monkeypatch.setattr("eval.run_eval.triage_enquiry", cannot_write)
+    monkeypatch.setattr("eval.agent_triage.run_eval.triage_enquiry", cannot_write)
     with pytest.raises(OSError, match="Disk full"):
         run_evaluation(FakeAnthropicClient([]), eval_data, tmp_path / "eval", show=lambda _: None)
 
 
 def test_cli_uses_given_directories_and_limit(eval_data, tmp_path, monkeypatch):
     client = FakeAnthropicClient([recommendation_response("ENQ-001")])
-    monkeypatch.setattr("eval.run_eval.boot_anthropic", lambda: client)
-    monkeypatch.setattr("eval.run_eval.load_dotenv", lambda: None)
+    monkeypatch.setattr("eval.agent_triage.run_eval.boot_anthropic", lambda: client)
+    monkeypatch.setattr("eval.agent_triage.run_eval.load_dotenv", lambda: None)
 
     main([
         "--data-dir", str(eval_data), "--output-dir", str(tmp_path / "eval"),
@@ -259,8 +259,8 @@ def test_cli_accepts_comma_separated_ids_and_trims_spaces(eval_data, tmp_path, m
     client = FakeAnthropicClient([
         recommendation_response("ENQ-003", "spam"), recommendation_response("ENQ-001"),
     ])
-    monkeypatch.setattr("eval.run_eval.boot_anthropic", lambda: client)
-    monkeypatch.setattr("eval.run_eval.load_dotenv", lambda: None)
+    monkeypatch.setattr("eval.agent_triage.run_eval.boot_anthropic", lambda: client)
+    monkeypatch.setattr("eval.agent_triage.run_eval.load_dotenv", lambda: None)
 
     main([
         "--data-dir", str(eval_data), "--output-dir", str(tmp_path / "eval"),
@@ -280,7 +280,7 @@ def test_invalid_cli_selection_exits_before_creating_a_client(selection, monkeyp
     def unexpected_client():
         pytest.fail("Invalid selection must fail before creating a client.")
 
-    monkeypatch.setattr("eval.run_eval.boot_anthropic", unexpected_client)
+    monkeypatch.setattr("eval.agent_triage.run_eval.boot_anthropic", unexpected_client)
     with pytest.raises(SystemExit) as error:
         main(selection)
     assert error.value.code == 2

@@ -31,10 +31,11 @@
   in message quotes; keep the rest case-sensitive. Finding a quote does not
   establish that the reasoning is correct.
 
-- **Keep evaluation answers separate from model input.** Use 100 fictional
-  enquiries, retaining the original 47. Count failed runs in the results and score
-  duplicate targets separately. Preserve earlier reports when the code changes.
-  Full author review of the answer key is still pending.
+- **Evaluate triage and extraction separately.** Triage uses 100 fictional
+  enquiries; chatbot extraction uses ten fixed transcripts with one expected
+  final result each. Score the final fields and refusals, with no per-turn checks.
+  Keep answer keys out of model input and count failures in the results. Preserve
+  earlier reports when code changes. Author review of the keys is still pending.
 
 - **Make the output limit configurable.** Two live replies hit the 1,024-token
   ceiling, so triage now defaults to 2,048 and records the setting in evaluation
