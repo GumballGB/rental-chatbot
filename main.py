@@ -6,13 +6,12 @@ import dotenv
 from agents.agent_triage import triage_enquiry
 from agents.anthropic_functions import boot_anthropic
 from agents.rental_chatbot import run_rental_chat
-
 from core.audit import DEFAULT_AUDIT_DIR
 from core.manual_review import run_manual_review
 from core.store import JsonStore
 from core.writer import DEFAULT_OUTPUT_DIR
-
 from models.triage_result import TriageResult
+
 
 # Entry point for the rental chatbot application.
 def run_application(
