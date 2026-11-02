@@ -25,6 +25,9 @@ See the [results index](results/README.md) for every run's scores, reports, cost
 estimates and triage heatmaps. Earlier development runs `eval_1`–`eval_3` are
 preserved in [past_runs](results/past_runs/) and used a 1,024-token triage ceiling.
 
+The full write-up — system design, trade-offs and evaluation — is in
+[docs/Rental_Chatbot_and_Agent_Triage.pdf](docs/Rental_Chatbot_and_Agent_Triage.pdf).
+
 ![Confusion matrix for triage eval_9](results/official_runs/agent_triage/eval_9/confusion_matrix.png)
 
 *Triage `eval_9`: 97/100 correct labels, one evidence-check failure and 24/24 exact
